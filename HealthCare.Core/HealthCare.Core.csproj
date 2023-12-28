@@ -9,7 +9,9 @@
   <ItemGroup>
     <None Remove="Models\" />
   </ItemGroup>
+
+
   <ItemGroup>
-    <Folder Include="Models\" />
+    <ProjectReference Include="..\HealthCare.Domain\HealthCare.Domain.csproj" />
   </ItemGroup>
 </Project>
