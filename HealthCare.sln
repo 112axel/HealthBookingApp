@@ -7,7 +7,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HealthCare.WebApp", "Health
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HealthCare.Core", "HealthCare.Core\HealthCare.Core.csproj", "{3E6893A6-B70C-40C3-B131-A6611030B855}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HealthCare.Tests", "HealthCare.Tests\HealthCare.Tests.csproj", "{59D3B254-30D1-4E15-B77B-B0AD5E3EAAA4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HealthCare.Domain", "HealthCare.Domain\HealthCare.Domain.csproj", "{EE7A79CD-DF4F-4F3C-86F3-57ED9D82A1FB}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HealthCare.Tests", "HealthCare.Tests\HealthCare.Tests.csproj", "{59D3B254-30D1-4E15-B77B-B0AD5E3EAAA4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,6 +25,10 @@ Global
 		{3E6893A6-B70C-40C3-B131-A6611030B855}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3E6893A6-B70C-40C3-B131-A6611030B855}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3E6893A6-B70C-40C3-B131-A6611030B855}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EE7A79CD-DF4F-4F3C-86F3-57ED9D82A1FB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EE7A79CD-DF4F-4F3C-86F3-57ED9D82A1FB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EE7A79CD-DF4F-4F3C-86F3-57ED9D82A1FB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EE7A79CD-DF4F-4F3C-86F3-57ED9D82A1FB}.Release|Any CPU.Build.0 = Release|Any CPU
 		{59D3B254-30D1-4E15-B77B-B0AD5E3EAAA4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{59D3B254-30D1-4E15-B77B-B0AD5E3EAAA4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{59D3B254-30D1-4E15-B77B-B0AD5E3EAAA4}.Release|Any CPU.ActiveCfg = Release|Any CPU

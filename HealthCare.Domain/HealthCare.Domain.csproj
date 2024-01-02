@@ -6,12 +6,4 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
-  <ItemGroup>
-    <None Remove="Models\" />
-  </ItemGroup>
-
-
-  <ItemGroup>
-    <ProjectReference Include="..\HealthCare.Domain\HealthCare.Domain.csproj" />
-  </ItemGroup>
 </Project>
