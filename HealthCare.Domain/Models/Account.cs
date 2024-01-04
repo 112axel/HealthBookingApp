@@ -3,11 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Identity;
 
 namespace HealthCare.Domain.Models
 {
-    public class Account:IdentityUser
+    public class Account
     {
         public int Id { get; set; }
         public string FirstName { get; set; }

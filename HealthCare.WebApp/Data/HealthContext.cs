@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 namespace HealthCare.WebApp.Data
 {
 
-    public class HealthContext : DbContext
+    public class HelathContext : DbContext
     {
-        public HealthContext(DbContextOptions<HealthContext> options) : base(options)
+        public HelathContext(DbContextOptions<HelathContext> options) : base(options)
         {
 
         }

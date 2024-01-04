@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace HealthCare.WebApp.Migrations
 {
-    [DbContext(typeof(HealthContext))]
+    [DbContext(typeof(HelathContext))]
     [Migration("20231228015847_initialSetup")]
     partial class initialSetup
     {
