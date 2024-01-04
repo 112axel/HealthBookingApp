@@ -5,8 +5,45 @@
 
 <h3>My Page</h3>
 
+@if (patients != null && patients.Any())
+{
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Account Info</th>
+                <th>Appointments</th>
+                <!-- Add more headers for additional patient properties -->
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var patient in patients)
+            {
+                <tr>
+                    <td>@patient.Id</td>
+                    <td>@($"{patient.Account.FirstName} {patient.Account.LastName} - {patient.Account.Email}")</td>
+                    <td>
+                        <ul>
+                            @foreach (var appointment in patient.Appointments)
+                            {
+                                <li>@($"{appointment.Service} on {appointment.DateTime}")</li>
+                            }
+                        </ul>
+                    </td>
+                    <!-- Add more cells for additional patient properties -->
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>No patient information found.</p>
+}
+
 @code {
     private List<Patient> patients;
+
     protected override void OnInitialized()
     {
         patients = UserService.GetPatients();
