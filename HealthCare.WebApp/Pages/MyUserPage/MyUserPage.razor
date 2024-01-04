@@ -1,13 +1,14 @@
-﻿@**@
-@inject
-@**@
+﻿@*the UserPageService is added in program.cs *@
+@inject UserPageService UserService
 @page "/personal-dashboard"
-
-
-
+@using HealthCare.Domain.Models
 
 <h3>My Page</h3>
 
 @code {
-
+    private List<Patient> patients;
+    protected override void OnInitialized()
+    {
+        patients = UserService.GetPatients();
+    }
 }
