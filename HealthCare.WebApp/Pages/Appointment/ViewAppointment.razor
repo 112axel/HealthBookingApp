@@ -2,6 +2,8 @@
 @inject AppointmentService appointmentService
 @*sets the component as a route, nav is changes to this route => see NavMenu*@
 @page "/appointment"
+@using HealthCare.WebApp.Pages;
+@using Microsoft.AspNetCore.Http;
 
 <h3>View Appointment Details</h3>
 
@@ -14,6 +16,7 @@
 {
     <p>@appointmentDetails.Details</p>
 }
+
 
 @code {
     private string appointmentId;
