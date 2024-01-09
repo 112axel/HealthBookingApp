@@ -114,13 +114,14 @@ namespace HealthCare.WebApp.Areas.Identity.Pages.AccountNamespace
             if (ModelState.IsValid)
             {
                 var user = CreateUser();
-
+                //TODO save right name
                 user.FirstName = "testing";
                 user.LastName = "testingson";
 
                 await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
                 await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
                 var result = await _userManager.CreateAsync(user, Input.Password);
+                await _userManager.AddToRoleAsync(user, "Patient");
 
                 if (result.Succeeded)
                 {

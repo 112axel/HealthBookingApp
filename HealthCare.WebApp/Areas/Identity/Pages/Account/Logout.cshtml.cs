@@ -13,6 +13,8 @@ using Microsoft.Extensions.Logging;
 
 namespace HealthCare.WebApp.Areas.Identity.Pages.AccountNamespace
 {
+    [AllowAnonymous]
+    [IgnoreAntiforgeryToken]
     public class LogoutModel : PageModel
     {
         private readonly SignInManager<Account> _signInManager;

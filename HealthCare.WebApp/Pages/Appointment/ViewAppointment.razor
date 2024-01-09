@@ -5,6 +5,11 @@
 @using HealthCare.WebApp.Pages;
 @using Microsoft.AspNetCore.Http;
 
+<AuthorizeView Roles="Patient">
+    <p>only vissible for patient</p>
+</AuthorizeView>
+
+
 <h3>View Appointment Details</h3>
 
 <label for="appointmentId">Appointment ID:</label>
@@ -19,6 +24,7 @@
 
 
 @code {
+
     private string appointmentId;
     private AppointmentService.AppointmentDetails appointmentDetails;
 
