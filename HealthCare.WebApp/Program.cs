@@ -1,27 +1,34 @@
-﻿using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
 using HealthCare.Core;
-using HealthCare.WebApp.Data;
 using Microsoft.EntityFrameworkCore;
+using HealthCare.WebApp.Data;
+using HealthCare.Domain.Models;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Components.Authorization;
+using HealthCare.WebApp.Areas.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
+builder.Services.AddMvc();
 builder.Services.AddScoped<FeedbackService>();
 builder.Services.AddScoped<AppointmentService>();
 builder.Services.AddScoped<BookingService>();
 builder.Services.AddScoped<UserPageService>();
 
+builder.Services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<Account>>();
 
-builder.Services.AddDbContext<HelathContext>(options =>
+builder.Services.AddDbContext<HealthContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("Database"));
-
-    //Allan
-    //options.UseSqlServer(@"Server=MSI\SQLEXPRESS;Database=Jobscout;Integrated Security=true;TrustServerCertificate=true;");
 });
+
+builder.Services.AddIdentity<Account,IdentityRole>(options => options.SignIn.RequireConfirmedAccount = true)
+    .AddEntityFrameworkStores<HealthContext>()
+    .AddDefaultTokenProviders()
+    .AddDefaultUI();
+
 
 var app = builder.Build();
 
@@ -33,11 +40,26 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
+using (var scope = app.Services.CreateScope())
+{
+    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+    var roles = new[] { "Doctor", "Patient" };
+
+    foreach(var role in roles)
+    {
+        if(!await roleManager.RoleExistsAsync(role))
+        {
+            await roleManager.CreateAsync(new IdentityRole(role));
+        }
+    }
+}
 app.UseHttpsRedirection();
 
 app.UseStaticFiles();
 
 app.UseRouting();
+
+app.UseAuthorization();
 
 app.MapBlazorHub();
 app.MapFallbackToPage("/_Host");

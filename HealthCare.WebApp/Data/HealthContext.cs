@@ -1,4 +1,5 @@
 ﻿using HealthCare.Domain.Models;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -9,14 +10,15 @@ using System.Threading.Tasks;
 namespace HealthCare.WebApp.Data
 {
 
-    public class HelathContext : DbContext
+    public class HealthContext : IdentityDbContext<Account>
     {
-        public HelathContext(DbContextOptions<HelathContext> options) : base(options)
+        public HealthContext(DbContextOptions<HealthContext> options) : base(options)
         {
 
         }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            base.OnModelCreating(modelBuilder);
         }
 
         public DbSet<Appointment> Appointments { get; set; }
