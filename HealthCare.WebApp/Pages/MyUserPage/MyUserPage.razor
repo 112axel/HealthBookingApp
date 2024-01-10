@@ -1,51 +1,46 @@
 ﻿@*the UserPageService is added in program.cs *@
 @inject UserPageService UserService
+@using System.Security.Claims
+@inject AuthenticationStateProvider AuthenticationStateProvider
 @page "/personal-dashboard"
 @using HealthCare.Domain.Models
 
-<h3>My Page</h3>
+<AuthorizeView>
+    <Authorized>
+        <h3>Hello, @context.User.Identity.Name!</h3>
+        You can only see this if you're authenticated.
+    </Authorized>
+</AuthorizeView>
 
-@if (patients != null && patients.Any())
+@if (currentUser != null)
 {
-    <table>
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Account Info</th>
-                <th>Appointments</th>
-                <!-- Add more headers for additional patient properties -->
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var patient in patients)
+    <div>
+        <h4>@($"{currentUser.Account.FirstName} {currentUser.Account.LastName}")</h4>
+        <ul>
+            @foreach (var appointment in currentUser.Appointments)
             {
-                <tr>
-                    <td>@patient.Id</td>
-                    <td>@($"{patient.Account.FirstName} {patient.Account.LastName} - {patient.Account.Email}")</td>
-                    <td>
-                        <ul>
-                            @foreach (var appointment in patient.Appointments)
-                            {
-                                <li>@($"{appointment.Service} on {appointment.DateTime}")</li>
-                            }
-                        </ul>
-                    </td>
-                    <!-- Add more cells for additional patient properties -->
-                </tr>
+                <li>@($"{appointment.Service} on {appointment.DateTime}")</li>
             }
-        </tbody>
-    </table>
+        </ul>
+    </div>
 }
 else
 {
-    <p>No patient information found.</p>
+    <p>No user information found for the current user.</p>
 }
 
 @code {
-    private List<Patient> patients;
+    private Patient currentUser;
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        patients = UserService.GetPatients();
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.Identity.IsAuthenticated)
+        {
+            // Retrieve data for the currently authenticated user
+            currentUser = UserService.GetPatients().FirstOrDefault(p => p.Account.Id == user.FindFirstValue(ClaimTypes.NameIdentifier));
+        }
     }
 }
