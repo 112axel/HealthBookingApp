@@ -20,7 +20,7 @@ namespace HealthCare.Core
 
             public Patient GetPatientById(string accountId)
             {
-                // Use Entity Framework Core to retrieve the patient by ID from the database
+                // Retrieve the patient by ID from the database
                 return healthContext.Patients
                     .Include(p => p.Account)
                     .Include(p => p.Appointments)

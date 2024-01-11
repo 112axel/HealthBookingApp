@@ -7,29 +7,33 @@
 @using HealthCare.Data
 @page "/personal-dashboard"
 
-<AuthorizeView>
+<AuthorizeView Roles="patient">
     <Authorized>
         <h3>Hello, @context.User.Identity.Name!</h3>
-        You can only see this if you're authenticated.
+        You can only see this if you're a patient.
+
+        @if (currentUser != null)
+        {
+            <div>
+                <h4>@($"{currentUser.Account.FirstName} {currentUser.Account.LastName}")</h4>
+                <ul>
+                    @foreach (var appointment in currentUser.Appointments)
+                    {
+                        <li>@($"{appointment.Service} on {appointment.DateTime}")</li>
+                    }
+                </ul>
+            </div>
+        }
+        else
+        {
+            <p>No user information found for the current user.</p>
+        }
     </Authorized>
+    <NotAuthorized>
+        <p>You are not authorized to view this content.</p>
+    </NotAuthorized>
 </AuthorizeView>
 
-@if (currentUser != null)
-{
-    <div>
-        <h4>@($"{currentUser.Account.FirstName} {currentUser.Account.LastName}")</h4>
-        <ul>
-            @foreach (var appointment in currentUser.Appointments)
-            {
-                <li>@($"{appointment.Service} on {appointment.DateTime}")</li>
-            }
-        </ul>
-    </div>
-}
-else
-{
-    <p>No user information found for the current user.</p>
-}
 
 @code {
     private Patient currentUser;
