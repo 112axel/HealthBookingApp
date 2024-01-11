@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace HealthCare.WebApp.Data
+namespace HealthCare.Data
 {
 
     public class HealthContext : IdentityDbContext<Account>
@@ -25,6 +25,5 @@ namespace HealthCare.WebApp.Data
         public DbSet<Patient> Patients { get; set; }
         public DbSet<Review> Reviews { get; set; }
         public DbSet<Staff> Staff { get; set; }
-
     }
 }
