@@ -50,5 +50,41 @@ namespace HealthCare.Tests
                 ClearDatabase(InMemoryDatabaseContext());
             }
         }
+
+        [Fact]
+        public void ReturnsAllFeedbackFromDatabase()
+        {
+            // Arrange
+            using (var context = new HealthContext(InMemoryDatabaseContext()))
+            {
+                var feedbackService = new FeedbackService(context);
+                var comment1 = "Test Comment 1";
+                var rating1 = Rating.Satisfied;
+
+                var comment2 = "Test Comment 2";
+                var rating2 = Rating.Perfect;
+
+                feedbackService.SaveFeedback(comment1, rating1);
+                feedbackService.SaveFeedback(comment2, rating2);
+
+                // Act
+                var allFeedback = feedbackService.GetAllFeedback();
+
+                // Assert
+                Assert.Equal(2, allFeedback.Count());
+
+                var feedback1 = allFeedback.ElementAt(0);
+                var feedback2 = allFeedback.ElementAt(1);
+
+                Assert.Equal(comment1, feedback1.Comment);
+                Assert.Equal(rating1, feedback1.Rating);
+
+                Assert.Equal(comment2, feedback2.Comment);
+                Assert.Equal(rating2, feedback2.Rating);
+
+                //Clear
+                ClearDatabase(InMemoryDatabaseContext());
+            }
+        }
     }
 }
