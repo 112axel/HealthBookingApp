@@ -113,7 +113,7 @@ namespace HealthCare.WebApp.Data
 
         private Account CreateAccount(string firstName, string lastName)
         {
-            var account = new Account { FirstName = firstName, LastName = lastName };
+            var account = new Account { FirstName = firstName, LastName = lastName,EmailConfirmed=true, };
 
             string userName = $"{firstName.ToLower()}.{lastName.ToLower()}@test.com";
 
