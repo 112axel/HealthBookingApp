@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HealthCare.Tests
 {
-    public class HealthCareUnitTests
+    public class FeedbackServiceTests
     {
         //Create database for testing.
         public DbContextOptions<HealthContext> InMemoryDatabaseContext()
