@@ -52,6 +52,9 @@ using (var scope = app.Services.CreateScope())
             await roleManager.CreateAsync(new IdentityRole(role));
         }
     }
+    //Load seeded doctors
+
+    SeedData.
 }
 app.UseHttpsRedirection();
 
