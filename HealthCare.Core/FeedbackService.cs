@@ -1,33 +1,28 @@
-﻿using System;
+﻿using HealthCare.Data;
+using HealthCare.Domain.Enums;
+using HealthCare.Domain.Models;
+using System;
 namespace HealthCare.Core
 {
     public class FeedbackService
     {
-        private List<string> feedbackList = new List<string>();
+        private readonly HealthContext _context;
 
-        public FeedbackService()
+        public FeedbackService(HealthContext context)
         {
-            LoadDummyData();
+            _context = context;
         }
 
-        private void LoadDummyData()
+        public void SaveFeedback(string comment, Rating rating)
         {
-            // mock data
-            feedbackList.Add("Great service, thank you!");
-            feedbackList.Add("Very satisfied with the care provided.");
+            var review = new Review { Comment = comment, Rating = rating };
+            _context.Reviews.Add(review);
+            _context.SaveChanges();
         }
 
-        public void SaveFeedback(string feedback)
+        public IEnumerable<Review> GetAllFeedback()
         {
-            feedbackList.Add(feedback);
-        }
-
-        public IEnumerable<string> GetAllFeedback()
-        {
-            return feedbackList;
+            return _context.Reviews.ToList();
         }
     }
 }
-
-
-

@@ -133,7 +133,7 @@ namespace HealthCare.WebApp.Areas.Identity.Pages.AccountNamespace
                     var callbackUrl = Url.Page(
                         "/Account/ConfirmEmail",
                         pageHandler: null,
-                        values: new { area = "Identity", userId = userId, code = code, returnUrl = returnUrl },
+                        values: new { area = "Identity", userId, code, returnUrl },
                         protocol: Request.Scheme);
 
                     await _emailSender.SendEmailAsync(Input.Email, "Confirm your email",
@@ -141,7 +141,7 @@ namespace HealthCare.WebApp.Areas.Identity.Pages.AccountNamespace
 
                     if (_userManager.Options.SignIn.RequireConfirmedAccount)
                     {
-                        return RedirectToPage("RegisterConfirmation", new { email = Input.Email, returnUrl = returnUrl });
+                        return RedirectToPage("RegisterConfirmation", new { email = Input.Email, returnUrl });
                     }
                     else
                     {
@@ -167,8 +167,8 @@ namespace HealthCare.WebApp.Areas.Identity.Pages.AccountNamespace
             }
             catch
             {
-                throw new InvalidOperationException($"Can't create an instance of '{nameof(AccountNamespace)}'. " +
-                    $"Ensure that '{nameof(AccountNamespace)}' is not an abstract class and has a parameterless constructor, or alternatively " +
+                throw new InvalidOperationException($"Can't create an instance of '{nameof(Account)}'. " +
+                    $"Ensure that '{nameof(Account)}' is not an abstract class and has a parameterless constructor, or alternatively " +
                     $"override the register page in /Areas/Identity/Pages/Account/Register.cshtml");
             }
         }
