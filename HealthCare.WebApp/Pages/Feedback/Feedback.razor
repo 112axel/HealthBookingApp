@@ -4,48 +4,59 @@
 @page "/feedback"
 @using HealthCare.Domain.Enums
 
-<h3>Leave Feedback</h3>
-<input @bind="userFeedback" />
-<div>
-    <span>Rate the service:</span>
-    <select @bind="selectedRating">
-        @foreach (Rating rating in Enum.GetValues(typeof(Rating)))
-        {
-            <option value="@rating">@rating.ToString()</option>
-        }
-    </select>
-</div>
-<button @onclick="SubmitFeedback">Submit Feedback</button>
+<div class="container mt-5">
+    <h3 class="mb-4">Leave Feedback</h3>
 
-<h3 class="feedback">All Feedback</h3>
-@foreach (var feedback in feedbackService.GetAllFeedback())
-{
-    <div class="card mb-3">
-        <div class="card-body">
-            <h5 class="card-title">Feedback</h5>
-            <div class="row">
-                <div class="col-md-2">
-                    <label for="comment">Comment:</label>
-                    <p name="comment">@feedback.Comment</p>
-                </div>
-                <div class="col-md-2">
-                    <label for="rating">Rating:</label>
-                    <p name="rating">@feedback.Rating</p>
+    <div class="mb-3">
+        <label for="userFeedback" class="form-label">Your Feedback:</label>
+        <input type="text" class="form-control" id="userFeedback" @bind="userFeedback" />
+    </div>
+
+    <div class="mb-3">
+        <label for="selectedRating" class="form-label">Rate the Service:</label>
+        <select class="form-select" id="selectedRating" @bind="selectedRating">
+            @foreach (Rating rating in Enum.GetValues(typeof(Rating)))
+            {
+                <option value="@rating">@rating.ToString()</option>
+            }
+        </select>
+    </div>
+
+    <button type="button" class="btn btn-primary" @onclick="SubmitFeedback">Submit Feedback</button>
+</div>
+
+<div class="container mt-5">
+    <h3 class="feedback mb-4">All Feedback</h3>
+
+    @foreach (var feedback in feedbackService.GetAllFeedback())
+    {
+        <div class="card mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Feedback</h5>
+                <div class="row">
+                    <div class="col-md-6">
+                        <label for="comment" class="form-label">Comment:</label>
+                        <p class="form-control" name="comment">@feedback.Comment</p>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="rating" class="form-label">Rating:</label>
+                        <p class="form-control" name="rating">@feedback.Rating</p>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-}
+    }
+</div>
 
 @code {
     private string userFeedback;
-    private Rating selectedRating = Rating.Horible; // Default one star
+    private Rating selectedRating = Rating.Neutral; // Default one star
 
     private void SubmitFeedback()
     {
         feedbackService.SaveFeedback(userFeedback, selectedRating);
         // reset the input field
         userFeedback = string.Empty;
-        selectedRating = Rating.Horible;
+        selectedRating = Rating.Neutral;
     }
 }

@@ -13,7 +13,6 @@
     <None Remove="Pages\Appointment\" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Migrations\" />
     <Folder Include="Pages\Feedback\" />
     <Folder Include="Pages\Appointment\" />
   </ItemGroup>

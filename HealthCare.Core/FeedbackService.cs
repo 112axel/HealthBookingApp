@@ -1,4 +1,5 @@
-﻿using HealthCare.Domain.Enums;
+﻿using HealthCare.Data;
+using HealthCare.Domain.Enums;
 using HealthCare.Domain.Models;
 using System;
 namespace HealthCare.Core

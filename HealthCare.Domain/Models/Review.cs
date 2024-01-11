@@ -12,6 +12,5 @@ namespace HealthCare.Domain.Models
         public int Id { get; set; }
         public string Comment { get; set; }
         public Rating Rating { get; set; }
-        public Appointment Appointment { get; set; }
     }
 }
