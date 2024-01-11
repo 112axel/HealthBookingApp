@@ -2,9 +2,9 @@
 using HealthCare.Domain.Enums;
 using System.Runtime.InteropServices;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Build.Framework;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using System.Runtime.CompilerServices;
+using HealthCare.Data;
 
 namespace HealthCare.WebApp.Data
 {
@@ -20,7 +20,7 @@ namespace HealthCare.WebApp.Data
 
         }
 
-        private void SaveSeedStaff(HealthContext context)
+        public async Task SeedDataToDB(HealthContext context)
         {
             List<Staff> seedStaff = new()
             {
@@ -28,9 +28,64 @@ namespace HealthCare.WebApp.Data
                 CreateStaff("Anna", "Karlson", Role.Distriktssköterska),
             };
 
-            foreach(var staff in seedStaff){
-                context.Add(staff);
+            foreach (var staff in seedStaff)
+            {
+                context.Staff.Add(staff);
+                context.SaveChanges();
+                await userManager.AddToRoleAsync(staff.Account, "Doctor");
             }
+
+            List<Patient> seedPatients = new()
+            {
+                CreatePatinet("Farbror","Anka"),
+                CreatePatinet("Kalle","Lind")
+            };
+
+            //every patient will have these 5 meetings per day for a whole week with one staff
+            //Assumed apointment length of 30 min
+            List<DateTime> apointmetTimes = new()
+            {
+                GetNextMonday().AddHours(8),
+                GetNextMonday().AddHours(8).AddMinutes(30),
+
+                GetNextMonday().AddHours(9),
+                GetNextMonday().AddHours(9).AddMinutes(30),
+
+                GetNextMonday().AddHours(12),
+            };
+
+
+
+            for (int i = 0; i < seedPatients.Count; i++)
+            {
+                context.Patients.Add(seedPatients[i]);
+                context.SaveChanges();
+                await userManager.AddToRoleAsync(seedPatients[i].Account, "Patient");
+                //generate appointments for patient
+                for (int day = 0; day < 7; day++)
+                {
+                    foreach (var time in apointmetTimes)
+                    {
+                        context.Appointments.Add(CreateAppointment(time.AddDays(day), seedStaff[i], seedPatients[i]));
+                    }
+                    context.SaveChanges();
+                }
+            }
+
+
+
+            context.SaveChanges();
+        }
+
+        private Appointment CreateAppointment(DateTime dateTime, Staff doctor, Patient patient)
+        {
+            return new Appointment
+            {
+                DateTime = dateTime,
+                Patient = patient,
+                Staff = doctor,
+                Service = "Test Checkup"
+            };
         }
 
 
@@ -40,10 +95,19 @@ namespace HealthCare.WebApp.Data
             {
                 Account = CreateAccount(firstName, lastName),
                 Role = role,
-                Schedule = new Schedule {
+                Schedule = new Schedule
+                {
                     Days = Days.WeekDay,
                     WeekDate = GetNextMonday()
                 },
+            };
+        }
+
+        private Patient CreatePatinet(string firstName, string lastName)
+        {
+            return new Patient
+            {
+                Account = CreateAccount(firstName, lastName),
             };
         }
 
@@ -51,11 +115,11 @@ namespace HealthCare.WebApp.Data
         {
             var account = new Account { FirstName = firstName, LastName = lastName };
 
-            string userName = $"{firstName.ToLower()}.{lastName.ToLower()}";
+            string userName = $"{firstName.ToLower()}.{lastName.ToLower()}@test.com";
 
             userStore.SetUserNameAsync(account, userName, CancellationToken.None);
 
-            userManager.CreateAsync(account,"P@ssword1");
+            userManager.CreateAsync(account, "P@ssword1");
             return account;
         }
 

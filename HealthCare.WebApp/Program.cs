@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Components.Authorization;
 using HealthCare.WebApp.Areas.Identity;
 using HealthCare.Data;
+using HealthCare.WebApp.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -52,9 +53,15 @@ using (var scope = app.Services.CreateScope())
             await roleManager.CreateAsync(new IdentityRole(role));
         }
     }
+    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<Account>>();
+    var userStore = scope.ServiceProvider.GetRequiredService<IUserStore<Account>>();
     //Load seeded doctors
-
-    SeedData.
+    var context = scope.ServiceProvider.GetRequiredService<HealthContext>();
+    if (!context.Staff.Any())
+    {
+        var creator = new SeedData(userManager,userStore);
+        await creator.SeedDataToDB(context);
+    }
 }
 app.UseHttpsRedirection();
 
