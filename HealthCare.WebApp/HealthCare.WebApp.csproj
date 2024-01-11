@@ -21,6 +21,7 @@
     <ProjectReference Include="..\HealthCare.Core\HealthCare.Core.csproj">
       <GlobalPropertiesToRemove></GlobalPropertiesToRemove>
     </ProjectReference>
+    <ProjectReference Include="..\HealthCare.Data\HealthCare.Data.csproj" />
   </ItemGroup>
   
   <ItemGroup>
