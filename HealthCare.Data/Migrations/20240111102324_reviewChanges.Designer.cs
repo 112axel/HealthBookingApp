@@ -4,6 +4,7 @@ using HealthCare.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HealthCare.WebApp.Migrations
 {
     [DbContext(typeof(HealthContext))]
-    partial class HelathContextModelSnapshot : ModelSnapshot
+    [Migration("20240111102324_reviewChanges")]
+    partial class reviewChanges
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -151,9 +154,6 @@ namespace HealthCare.WebApp.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("AppointmentId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Comment")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -162,8 +162,6 @@ namespace HealthCare.WebApp.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("AppointmentId");
 
                     b.ToTable("Reviews");
                 });
@@ -368,17 +366,6 @@ namespace HealthCare.WebApp.Migrations
                         .HasForeignKey("AccountId");
 
                     b.Navigation("Account");
-                });
-
-            modelBuilder.Entity("HealthCare.Domain.Models.Review", b =>
-                {
-                    b.HasOne("HealthCare.Domain.Models.Appointment", "Appointment")
-                        .WithMany()
-                        .HasForeignKey("AppointmentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Appointment");
                 });
 
             modelBuilder.Entity("HealthCare.Domain.Models.Staff", b =>
