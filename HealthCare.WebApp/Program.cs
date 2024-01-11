@@ -1,10 +1,10 @@
 using HealthCare.Core;
 using Microsoft.EntityFrameworkCore;
-using HealthCare.WebApp.Data;
 using HealthCare.Domain.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Components.Authorization;
 using HealthCare.WebApp.Areas.Identity;
+using HealthCare.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 

@@ -17,6 +17,12 @@
     <Folder Include="Pages\Feedback\" />
     <Folder Include="Pages\Appointment\" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\HealthCare.Core\HealthCare.Core.csproj">
+      <GlobalPropertiesToRemove></GlobalPropertiesToRemove>
+    </ProjectReference>
+    <ProjectReference Include="..\HealthCare.Data\HealthCare.Data.csproj" />
+  </ItemGroup>
   
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="7.0.14" />

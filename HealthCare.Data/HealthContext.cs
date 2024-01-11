@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace HealthCare.WebApp.Data
+namespace HealthCare.Data
 {
 
     public class HealthContext : IdentityDbContext<Account>
