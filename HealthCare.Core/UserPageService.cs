@@ -1,4 +1,6 @@
-﻿using HealthCare.Domain.Models;
+﻿using HealthCare.Data;
+using HealthCare.Domain.Models;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,31 +11,20 @@ namespace HealthCare.Core
 {
     public class UserPageService
     {
-        public List<Patient> GetPatients() 
-        {
-            var patients = new List<Patient>
-            {
-                new Patient
-            {
-                Id = 1,
-                Account = new Account {Id = "2", FirstName = "John", LastName = "Doe", Email = "john@example.com"},
-                Appointments = new List<Appointment>
-                {
-                    new Appointment { Id = 1, DateTime = DateTime.Now, Service = "Checkup" },
-                }
-            },
-            new Patient
-            {
-                Id = 2,
-                Account = new Account { Id = "2", FirstName = "Jane", LastName = "Doe", Email = "jane@example.com"},
-                Appointments = new List<Appointment>
-                {
-                    new Appointment { Id = 2, DateTime = DateTime.Now.AddDays(7), Service = "Cleaning" },
-                }
-            },
-            };
+            private readonly HealthContext healthContext;
 
-            return patients;
-        }
+            public UserPageService(HealthContext healthContext)
+            {
+                this.healthContext = healthContext;
+            }
+
+            public Patient GetPatientById(string accountId)
+            {
+                // Retrieve the patient by ID from the database
+                return healthContext.Patients
+                    .Include(p => p.Account)
+                    .Include(p => p.Appointments)
+                    .FirstOrDefault(p => p.Account.Id == accountId);
+            }
     }
 }

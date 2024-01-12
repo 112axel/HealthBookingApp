@@ -17,6 +17,7 @@ builder.Services.AddScoped<FeedbackService>();
 builder.Services.AddScoped<AppointmentService>();
 builder.Services.AddScoped<BookingService>();
 builder.Services.AddScoped<UserPageService>();
+builder.Services.AddScoped<DoctorPageService>();
 
 builder.Services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<Account>>();
 
