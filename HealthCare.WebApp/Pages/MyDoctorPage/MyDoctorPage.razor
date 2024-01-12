@@ -3,12 +3,12 @@
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @page "/doctor-dashboard"
 
-<AuthorizeView Roles="doctor">
+<AuthorizeView Roles="Doctor">
     <Authorized>
         <h3>Hello, @context.User.Identity.Name!</h3>
         You can only see this if you're a doctor.
 
-        @if (currentUser != null)
+     @*    @if (currentUser != null)
         {
             <div>
                 <h4>@($"{currentUser.Account.FirstName} {currentUser.Account.LastName}")</h4>
@@ -23,7 +23,7 @@
         else
         {
             <p>No user information found for the current user.</p>
-        }
+        } *@
     </Authorized>
     <NotAuthorized>
         <p>You are not authorized to view this content.</p>

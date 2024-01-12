@@ -18,13 +18,13 @@ namespace HealthCare.Core
             this.healthContext = healthContext;
         }
 
-        public Doctor GetDoctorById(string accountId)
-        {
-            // Retrieve the doctor by ID from the database
-            return healthContext.Doctors
-                .Include(p => p.Account)
-                .Include(p => p.Schedule)
-                .FirstOrDefault(p => p.Account.Id == accountId);
-        }
+        //public Doctor GetDoctorById(string accountId)
+        //{
+        //    // Retrieve the doctor by ID from the database
+        //    return healthContext.Doctors
+        //        .Include(p => p.Account)
+        //        .Include(p => p.Schedule)
+        //        .FirstOrDefault(p => p.Account.Id == accountId);
+        //}
     }
 }
