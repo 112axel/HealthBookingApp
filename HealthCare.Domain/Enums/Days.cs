@@ -17,5 +17,8 @@ namespace HealthCare.Domain.Enums
         Friday = 0b_0001_0000,  // 16
         Saturday = 0b_0010_0000,  // 32
         Sunday = 0b_0100_0000,  // 64
+        WeekDay = Monday | Tuesday | Wednesday | Thursday | Friday,
+        Weekend = Saturday | Sunday
+
     }
 }
