@@ -7,7 +7,7 @@
 @using HealthCare.Data
 @page "/personal-dashboard"
 
-<AuthorizeView Roles="patient">
+<AuthorizeView Roles="Patient">
     <Authorized>
         <h3>Hello, @context.User.Identity.Name!</h3>
         You can only see this if you're a patient.
