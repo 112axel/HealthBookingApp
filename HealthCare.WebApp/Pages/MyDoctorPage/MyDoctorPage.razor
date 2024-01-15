@@ -1,14 +1,18 @@
 ﻿@*the DoctorPageService is added in program.cs *@
-@inject UserPageService UserService
+@inject DoctorPageService DoctorService
 @inject AuthenticationStateProvider AuthenticationStateProvider
+@using HealthCare.Domain.Models;
+@using System.Security.Claims
 @page "/doctor-dashboard"
+
+@* Staff.cs som jag ska hämta info ifrån *@
 
 <AuthorizeView Roles="Doctor">
     <Authorized>
         <h3>Hello, @context.User.Identity.Name!</h3>
         You can only see this if you're a doctor.
 
-     @*    @if (currentUser != null)
+        @if (currentUser != null)
         {
             <div>
                 <h4>@($"{currentUser.Account.FirstName} {currentUser.Account.LastName}")</h4>
@@ -22,15 +26,26 @@
         }
         else
         {
-            <p>No user information found for the current user.</p>
-        } *@
+            <p>No user information found for the current doctor.</p>
+        }
     </Authorized>
     <NotAuthorized>
         <p>You are not authorized to view this content.</p>
     </NotAuthorized>
 </AuthorizeView>
 
-
 @code {
+    private Staff currentUser;
 
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.Identity.IsAuthenticated)
+        {
+            // Retrieve data for the currently authenticated doctor
+            currentUser = DoctorService.GetDoctorByUserId(user.FindFirstValue(ClaimTypes.NameIdentifier));
+        }
+    }
 }
