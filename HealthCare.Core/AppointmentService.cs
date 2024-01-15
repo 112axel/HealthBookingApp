@@ -1,31 +1,37 @@
-﻿using System;
+﻿using HealthCare.Data;
+using HealthCare.Domain.Models;
+using Microsoft.EntityFrameworkCore;
+using System;
 namespace HealthCare.Core
 {
 	public class AppointmentService
 	{
-        private List<AppointmentDetails> appointments;
+        private readonly HealthContext _context;
 
-        public AppointmentService()
+        public AppointmentService(HealthContext context)
         {
-            // mock data
-            appointments = new List<AppointmentDetails>
-            {
-                new AppointmentDetails { Id = "1", PatientId = "100", Details = "Appointment with Dr. Smith" },
-                new AppointmentDetails { Id = "2", PatientId = "101", Details = "Appointment with Dr. Johnson" }
-            };
+            _context = context;
         }
 
-        public AppointmentDetails GetAppointmentDetails(string appointmentId)
+        public Patient GetPatientById(string accountId)
         {
-            return appointments.FirstOrDefault(a => a.Id == appointmentId);
+            // Retrieve the patient by ID from the database
+            return _context.Patients
+                .Include(p => p.Account)
+                .Include(p => p.Appointments)
+                .ThenInclude(p => p.Staff)
+                .ThenInclude(p => p.Account)
+                .FirstOrDefault(p => p.Account.Id == accountId);
         }
-
-
-        public class AppointmentDetails
+        public Staff GetDoctorById(string accountId)
         {
-            public string Id { get; set; }
-            public string PatientId { get; set; }
-            public string Details { get; set; }
+            // Retrieve the doctor by ID from the database
+            return _context.Staff
+                .Include(p => p.Account)
+                .Include(p => p.Appointments)
+                .ThenInclude(p => p.Patient)
+                .ThenInclude(p => p.Account)
+                .FirstOrDefault(p => p.Account.Id == accountId);
         }
     }
 }
