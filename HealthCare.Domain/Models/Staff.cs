@@ -13,7 +13,7 @@ namespace HealthCare.Domain.Models
         public Account Account { get; set; }
         public Role Role { get; set; }
         public List<Appointment> Appointments { get; set; }
-        public Schedule Schedule { get; set; }
+        public List<Schedule> Schedule { get; set; }
         
     }
 }
