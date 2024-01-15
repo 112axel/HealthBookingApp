@@ -25,7 +25,7 @@ namespace HealthCare.Core
                 .Include(s => s.Account)
                 .Include(s => s.Role)
                 .Include(s => s.Appointments)
-                .FirstOrDefault(s => s.Account.Id == accountId /*&& s.Role == Role.Doctor)*/);
+                .FirstOrDefault(s => s.Account.Id == accountId);
         }
     }
 }
