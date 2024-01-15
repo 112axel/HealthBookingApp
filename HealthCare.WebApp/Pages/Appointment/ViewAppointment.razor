@@ -1,35 +1,113 @@
 ﻿@*the AppointmentService is added in program.cs *@
 @inject AppointmentService appointmentService
+@inject HealthContext HealthContext
+@inject AuthenticationStateProvider AuthenticationStateProvider
 @*sets the component as a route, nav is changes to this route => see NavMenu*@
 @page "/appointment"
+@using HealthCare.Data
+@using HealthCare.Domain.Models
 @using HealthCare.WebApp.Pages;
 @using Microsoft.AspNetCore.Http;
+@using System.Security.Claims
 
 <AuthorizeView Roles="Patient">
-    <p>only vissible for patient</p>
+    @if (currentPatient != null)
+    {
+        <div class="container mt-4">
+            <div class="row">
+                <div class="col-md-6">
+                    <h3>Upcoming Appointments</h3>
+                    <hr class="mb-4 w-50">
+                    <div class="list-group">
+                        @foreach (var appointment in currentPatient.Appointments.Where(a => a.DateTime > DateTime.Now))
+                        {
+                            <div class="list-group-item">
+                                <h5 class="mb-1">@appointment.Service</h5>
+                                <p class="mb-1">@($"Date: {appointment.DateTime}")</p>
+                                <p class="mb-1">@($"Doctor: {appointment.Staff.Account.FirstName} {appointment.Staff.Account.LastName}.")</p>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <h3>Appointment History</h3>
+                    <hr class="mb-4 w-50">
+                    <div class="list-group">
+                        @foreach (var appointment in currentPatient.Appointments.Where(a => a.DateTime < DateTime.Now))
+                        {
+                            <div class="list-group-item">
+                                <h5 class="mb-1">@appointment.Service</h5>
+                                <p class="mb-1">@($"Date: {appointment.DateTime}")</p>
+                                <p class="mb-1">@($"Doctor: {appointment.Staff.Account.FirstName} {appointment.Staff.Account.LastName}.")</p>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
 </AuthorizeView>
 
+<AuthorizeView Roles="Doctor">
+    @if (currentDoctor != null)
+    {
+        <div class="container mt-4">
+            <div class="row">
+                <div class="col-md-6">
+                    <h3>Upcoming Appointments</h3>
+                    <hr class="mb-4 w-50">
+                    <div class="list-group">
+                        @foreach (var appointment in currentDoctor.Appointments.Where(a => a.DateTime > DateTime.Now))
+                        {
+                            <div class="list-group-item">
+                                <h5 class="mb-1">@appointment.Service</h5>
+                                <p class="mb-1">@($"Date: {appointment.DateTime}")</p>
+                                <p class="mb-1">@($"Patient: {appointment.Patient.Account.FirstName} {appointment.Patient.Account.LastName}.")</p>
+                            </div>
+                        }
+                    </div>
+                </div>
 
-<h3>View Appointment Details</h3>
-
-<label for="appointmentId">Appointment ID:</label>
-<input id="appointmentId" @bind="appointmentId" />
-
-<button @onclick="LoadAppointment">View Details</button>
-
-@if (appointmentDetails != null)
-{
-    <p>@appointmentDetails.Details</p>
-}
-
+                <div class="col-md-6">
+                    <h3>Appointment History</h3>
+                    <hr class="mb-4 w-50">
+                    <div class="list-group">
+                        @foreach (var appointment in currentDoctor.Appointments.Where(a => a.DateTime < DateTime.Now))
+                        {
+                            <div class="list-group-item">
+                                <h5 class="mb-1">@appointment.Service</h5>
+                                <p class="mb-1">@($"Date: {appointment.DateTime}")</p>
+                                <p class="mb-1">@($"Patient: {appointment.Patient.Account.FirstName} {appointment.Patient.Account.LastName}.")</p>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</AuthorizeView>
 
 @code {
+    private Patient currentPatient;
+    private Staff currentDoctor;
 
-    private string appointmentId;
-    private AppointmentService.AppointmentDetails appointmentDetails;
-
-    private void LoadAppointment()
+    protected override async Task OnInitializedAsync()
     {
-        appointmentDetails = appointmentService.GetAppointmentDetails(appointmentId);
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.Identity.IsAuthenticated)
+        {
+            // Retrieve data for the currently authenticated user
+            if (user.IsInRole("Patient"))
+            {
+                currentPatient = appointmentService.GetPatientById(user.FindFirstValue(ClaimTypes.NameIdentifier));
+            }
+            else
+            {
+                currentDoctor = appointmentService.GetDoctorById(user.FindFirstValue(ClaimTypes.NameIdentifier));
+            }
+        }
     }
 }
