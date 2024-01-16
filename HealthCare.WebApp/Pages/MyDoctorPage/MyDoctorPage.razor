@@ -16,6 +16,8 @@
         {
             <div>
                 <h4>@($"{currentUser.Account.FirstName} {currentUser.Account.LastName}")</h4>
+                 <p>Set Your Availability:</p>
+                 <SetDoctorAvailability />
                 <ul>
                     @foreach (var appointment in currentUser.Appointments)
                     {

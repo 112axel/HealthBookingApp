@@ -2,6 +2,7 @@
 @inject AppointmentService appointmentService
 @inject HealthContext HealthContext
 @inject AuthenticationStateProvider AuthenticationStateProvider
+@inject HealthCare.Core.DoctorPageService DoctorPageService
 @*sets the component as a route, nav is changes to this route => see NavMenu*@
 @page "/appointment"
 @using HealthCare.Data
@@ -111,3 +112,31 @@
         }
     }
 }
+
+@* @code {
+    private async Task BookAppointment(DateTime requestedDateTime)
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.Identity.IsAuthenticated && user.IsInRole("Patient"))
+        {
+            var patient = appointmentService.GetPatientById(user.FindFirstValue(ClaimTypes.NameIdentifier));
+            var doctorAccountId = DoctorPageService.GetDoctorByUserId(user.FindFirstValue(ClaimTypes.NameIdentifier)).Account.Id;
+
+            if (appointmentService.IsTimeSlotAvailableForDoctor(doctorAccountId, requestedDateTime) &&
+                DoctorPageService.IsDoctorAvailable(doctorAccountId, requestedDateTime.DayOfWeek))
+            {
+                // Logic to book the appointment
+                // You may want to add further logic to persist the appointment data, etc.
+            }
+            else
+            {
+                // Display a message to the patient that the selected time is not available
+                // This message should inform the patient that the selected time is not available.
+                Console.WriteLine("The selected time is not available. Please choose another time.");
+            }
+        }
+    }
+} *@
+

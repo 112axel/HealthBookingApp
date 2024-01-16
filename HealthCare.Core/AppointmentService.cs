@@ -33,6 +33,23 @@ namespace HealthCare.Core
                 .ThenInclude(p => p.Account)
                 .FirstOrDefault(p => p.Account.Id == accountId);
         }
+
+        public bool TimeSlotAvailableForDoctor(string doctorAccountId, DateTime requestedDateTime)
+        {
+            var doctor = GetDoctorById(doctorAccountId);
+
+            var existingAppointments = _context.Appointments
+                .Include(a => a.Staff)
+                .Where(a => a.Staff.Id == doctor.Id && a.DateTime.Date == requestedDateTime.Date)
+                .ToList();
+
+            // Check for overlapping appointments
+            var TimeSlotAvailable = !existingAppointments.Any(a =>
+                requestedDateTime >= a.DateTime && requestedDateTime < a.DateTime.AddMinutes(30));
+
+            return TimeSlotAvailable;
+        }
+
     }
 }
 

@@ -1,0 +1,53 @@
+﻿@page "/doctor-availability"
+@inject HealthCare.Core.DoctorPageService DoctorPageService
+@inherits LayoutComponentBase
+
+<h3>Set Doctor Availability</h3>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Day</th>
+            <th>Available</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var dayOfWeek in Enum.GetValues(typeof(DayOfWeek)).Cast<DayOfWeek>())
+        {
+            <tr>
+                <td>@dayOfWeek</td>
+                <td>
+                    <input type="checkbox" @(IsDayAvailable(dayOfWeek) ? "checked" : "" ) @onchange="() => ToggleAvailability(dayOfWeek)" />
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    private List<string> TimeSlots = new List<string> { "9:00 AM", "10:00 AM", "11:00 AM", "12:00 PM", "1:00 PM", "2:00 PM", "3:00 PM", "4:00 PM", "5:00 PM" };
+
+    private Dictionary<DayOfWeek, List<string>> SetDoctorAvailability = new Dictionary<DayOfWeek, List<string>>();
+
+    private bool IsChecked(DayOfWeek dayOfWeek, string timeSlot)
+    {
+        return SetDoctorAvailability.ContainsKey(dayOfWeek) && SetDoctorAvailability[dayOfWeek].Contains(timeSlot);
+    }
+
+    private void ToggleAvailability(DayOfWeek dayOfWeek, string timeSlot)
+    {
+        if (!SetDoctorAvailability.ContainsKey(dayOfWeek))
+        {
+            SetDoctorAvailability[dayOfWeek] = new List<string>();
+        }
+
+        if (SetDoctorAvailability[dayOfWeek].Contains(timeSlot))
+        {
+            SetDoctorAvailability[dayOfWeek].Remove(timeSlot);
+        }
+        else
+        {
+            SetDoctorAvailability[dayOfWeek].Add(timeSlot);
+        }
+    }
+}

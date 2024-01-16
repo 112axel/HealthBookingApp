@@ -10,7 +10,7 @@ namespace HealthCare.Domain.Models
     public class Schedule
     {
         public int Id { get; set; }
-        public DateTime WeekDate { get; set; } //date of the frist day of the week
+        public DateTime WeekDate { get; set; } //date of the first day of the week
         public Days Days { get; set; }
     }
 }
