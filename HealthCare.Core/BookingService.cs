@@ -13,35 +13,52 @@ namespace HealthCare.Core
             this.context = context;
         }
 
-        public List<Staff> GetStaff(Role role)
+        public void BookApointment(Staff staff, Patient patient, Appointment appointment)
         {
+            appointment.Staff = staff;
+            appointment.Patient = patient;
+            context.Appointments.Add(appointment);
+            context.SaveChanges();
+        }
+
+        public List<Staff> GetStaff(Role? role)
+        {
+            if(role is null)
+            {
+                return new();
+            }
+
             return context.Staff
                 .Include(x=>x.Appointments)
                 .Include(x=>x.Schedule)
+                .Include(x=>x.Account)
                 .Where(x=>x.Role == role).ToList();
         }
 
-        public List<Appointment>[] GetAvailableTimeSlots(Staff staff,DateTime weekStart)
+        public Dictionary<Days, List<Appointment>> GetAvailableTimeSlots(Staff staff,DateTime weekStart)
         {
-            List<Appointment> allTimeSlots = new();
-
             return AllApointmentsInWeek(staff.Appointments,staff.Schedule.First(x=>x.WeekDate == weekStart));
 
         }
 
-        private List<Appointment>[] AllApointmentsInWeek(List<Appointment> bookedAppointment, Schedule weekSchedule)
+        private Dictionary<Days, List<Appointment>> AllApointmentsInWeek(List<Appointment> bookedAppointment, Schedule weekSchedule)
         {
-            List<Appointment>[] all = new List<Appointment>[7];
+            Dictionary<Days, List<Appointment>> all = new();
             //Set time to 8
             var dateTime = weekSchedule.WeekDate.AddHours(8);
 
 
             foreach (var day in Enumerable.Range(0, 7))
             {
-                var flagValue = day == 0 ? 0 : Math.Pow(day, 2);
+                var flagValue = Math.Pow(2, day);
+
                 if (weekSchedule.Days.HasFlag((Days)flagValue))
                 {
-                    all[day] = AllApointmentsInDay(bookedAppointment, dateTime.AddDays(day));
+                    all.Add((Days)flagValue,AllApointmentsInDay(bookedAppointment, dateTime.AddDays(day)));
+                }
+                else
+                {
+                    all.Add((Days)flagValue, new());
                 }
             }
 
@@ -57,8 +74,8 @@ namespace HealthCare.Core
                 if(!bookedAppointment.Exists(x=>x.DateTime == currentTime))
                 {
                     appointments.Add(new Appointment { DateTime = currentTime, Service = "" });
-                    currentTime = currentTime.AddMinutes(30);
                 }
+                currentTime = currentTime.AddMinutes(30);
             }
             return appointments;
         }
