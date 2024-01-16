@@ -1,0 +1,114 @@
+﻿@using HealthCare.Domain.Models
+@using HealthCare.Domain.Enums
+@using HealthCare.WebApp.Pages;
+@using Microsoft.AspNetCore.Http;
+@using System.Security.Claims
+
+@inject BookingService BookingService
+@inject UserPageService UserService
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@page "/book-appointment"
+
+
+<AuthorizeView Roles="Patient">
+    <p>only vissible for patient</p>
+</AuthorizeView>
+
+
+<InputSelect @bind-Value="SelectedRole" @bind-Value:after="()=>{NewSelectedRole();}">
+    @foreach (var role in Enum.GetValues(typeof(Role))){
+        <option value="@role">
+            @role
+        </option>
+    }
+</InputSelect>
+
+@if(SelectedRole != null)
+{
+    <InputSelect @bind-Value="SelectedDoctor" @bind-Value:after="()=> {NewSelectedDoctor();}">
+        @foreach (var doctor in StaffOptions)
+        {
+            <option value="@doctor">
+                @($"{doctor.Account.FirstName} {doctor.Account.LastName}")
+            </option>
+        }
+    </InputSelect>
+}
+<div>
+
+    @foreach(var day in availibleTimes ) {
+        <div>
+            <h2>@day.Key.ToString()</h2>
+            @foreach (var appointment in day.Value)
+            {
+                <button onclick="@(()=>{BookApointment(appointment);})">@DateFromating(appointment.DateTime)</button>
+            }
+        </div>
+    }
+
+</div>
+@code {
+
+    private Dictionary<Days,List<Appointment>> availibleTimes = new();
+
+    private Role? SelectedRole { get; set; }
+    private Staff? SelectedDoctor { get; set; }
+    private List<Staff> StaffOptions { get; set; } = new();
+    private Patient currentUser;
+
+    protected async override Task OnInitializedAsync()
+    {
+
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.Identity.IsAuthenticated)
+        {
+            // Retrieve data for the currently authenticated user
+            currentUser = UserService.GetPatientById(user.FindFirstValue(ClaimTypes.NameIdentifier));
+        }
+
+        SelectedRole = Role.Distriktssköterska;
+        NewSelectedRole();
+    }
+
+    private void LoadAppointment(Staff staff, DateTime weekStart)
+    {
+        availibleTimes = BookingService.GetAvailableTimeSlots(staff, weekStart);
+    }
+
+    private void NewSelectedRole()
+    {
+        StaffOptions = BookingService.GetStaff(SelectedRole);
+        SelectedDoctor = StaffOptions.FirstOrDefault();
+        NewSelectedDoctor();
+        StateHasChanged();
+    }
+
+    private void NewSelectedDoctor()
+    {
+        LoadAppointment(SelectedDoctor,GetNextMonday());
+    }
+
+    private void BookApointment(Appointment apointment)
+    {
+        BookingService.BookApointment(SelectedDoctor, currentUser, apointment);
+        LoadAppointment(SelectedDoctor, GetNextMonday());
+        StateHasChanged();
+    }
+
+    private DateTime GetNextMonday()
+    {
+        DateTime today = DateTime.Today;
+        // The (... + 7) % 7 ensures we end up with a value in the range [0, 6]
+        int daysUntilMonday = ((int)DayOfWeek.Monday - (int)today.DayOfWeek + 7) % 7;
+        DateTime nextMonday = today.AddDays(daysUntilMonday);
+
+        return nextMonday;
+    }
+
+    private string DateFromating(DateTime datetime)
+    {
+        return $"{datetime.Hour}:{datetime.Minute.ToString().PadLeft(2, '0')}";
+    }
+}
