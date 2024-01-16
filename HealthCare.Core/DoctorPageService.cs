@@ -38,7 +38,7 @@ namespace HealthCare.Core
     //    {
     //        // Logic to retrieve the doctors weekly schedule from the database
     //        // This should return a list of the doctors availability for the upcoming week
-    //        return new List<Schedule>(); // Placeholder
+    //        return new List<Schedule>();
     //    }
     
     //public bool IsDoctorAvailable(string doctorAccountId, DayOfWeek dayOfWeek)

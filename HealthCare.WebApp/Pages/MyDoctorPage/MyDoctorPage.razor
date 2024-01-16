@@ -12,18 +12,32 @@
         <h3>Hello, @context.User.Identity.Name!</h3>
         You can only see this if you're a doctor.
 
-        @if (currentUser != null)
+     @if (currentUser != null)
         {
             <div>
                 <h4>@($"{currentUser.Account.FirstName} {currentUser.Account.LastName}")</h4>
-                 <p>Set Your Availability:</p>
-                 <SetDoctorAvailability />
-                <ul>
-                    @foreach (var appointment in currentUser.Appointments)
-                    {
-                        <li>@($"{appointment.Service} on {appointment.DateTime}")</li>
-                    }
-                </ul>
+                <p>Set Your Availability:</p>
+                <SetDoctorAvailability />
+                <h5>Upcoming Appointments:</h5>
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Time</th>
+                            <th>Patient Name</th>
+                            <th>Reason</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var appointment in currentUser.Appointments)
+                        {
+                            <tr>
+                                <td>@appointment.DateTime.ToString("h:mm tt")</td>
+                                <td>@($"{appointment.Patient.Account.FirstName} {appointment.Patient.Account.LastName}")</td>
+                                <td>@appointment.Service</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
             </div>
         }
         else
