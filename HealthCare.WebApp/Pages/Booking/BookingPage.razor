@@ -35,6 +35,10 @@
     </InputSelect>
 }
 <div>
+    <lable>What service do you recuire?:</lable>
+    <input @bind="subject" />
+</div>
+<div>
 
     @foreach(var day in availibleTimes ) {
         <div>
@@ -55,6 +59,7 @@
     private Staff? SelectedDoctor { get; set; }
     private List<Staff> StaffOptions { get; set; } = new();
     private Patient currentUser;
+    private string subject { get; set; }
 
     protected async override Task OnInitializedAsync()
     {
@@ -92,7 +97,7 @@
 
     private void BookApointment(Appointment apointment)
     {
-        BookingService.BookApointment(SelectedDoctor, currentUser, apointment);
+        BookingService.BookApointment(SelectedDoctor, currentUser, apointment,subject);
         LoadAppointment(SelectedDoctor, GetNextMonday());
         StateHasChanged();
     }
