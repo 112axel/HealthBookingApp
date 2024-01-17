@@ -12,6 +12,8 @@ namespace HealthCare.Domain.Models
         //Id is implemented by IdentityUser
         public string FirstName { get; set; }
         public string LastName { get; set; }
+        public Patient? Patient { get; set; }
+        public Staff? Staff { get; set; }
 
     }
 }

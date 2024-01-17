@@ -18,6 +18,15 @@ namespace HealthCare.Data
         }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<Patient>()
+                .HasOne(x=>x.Account)
+                .WithOne(x=>x.Patient)
+                .HasForeignKey<Patient>(x=>x.AccountId);
+
+            modelBuilder.Entity<Staff>()
+                .HasOne(x=>x.Account)
+                .WithOne(x=>x.Staff)
+                .HasForeignKey<Staff>(x=>x.AccountId);
             base.OnModelCreating(modelBuilder);
         }
 
