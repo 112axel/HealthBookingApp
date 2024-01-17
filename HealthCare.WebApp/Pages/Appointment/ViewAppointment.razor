@@ -2,6 +2,7 @@
 @inject AppointmentService appointmentService
 @inject HealthContext HealthContext
 @inject AuthenticationStateProvider AuthenticationStateProvider
+@inject HealthCare.Core.DoctorPageService DoctorPageService
 @*sets the component as a route, nav is changes to this route => see NavMenu*@
 @page "/appointment"
 @using HealthCare.Data
@@ -111,3 +112,4 @@
         }
     }
 }
+

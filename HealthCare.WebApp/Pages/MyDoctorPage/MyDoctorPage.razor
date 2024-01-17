@@ -5,23 +5,34 @@
 @using System.Security.Claims
 @page "/doctor-dashboard"
 
-@* Staff.cs som jag ska hämta info ifrån *@
-
 <AuthorizeView Roles="Doctor">
     <Authorized>
         <h3>Hello, @context.User.Identity.Name!</h3>
-        You can only see this if you're a doctor.
 
         @if (currentUser != null)
         {
             <div>
                 <h4>@($"{currentUser.Account.FirstName} {currentUser.Account.LastName}")</h4>
-                <ul>
-                    @foreach (var appointment in currentUser.Appointments)
-                    {
-                        <li>@($"{appointment.Service} on {appointment.DateTime}")</li>
-                    }
-                </ul>
+                <p>Set Your Availability:</p>
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Day</th>
+                            <th>Available</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var dayOfWeek in Enum.GetValues(typeof(DayOfWeek)).Cast<DayOfWeek>())
+                        {
+                            <tr>
+                                <td>@dayOfWeek</td>
+                                <td>
+                                    <input type="checkbox" @(IsDayAvailable(dayOfWeek) ? "checked" : "" ) @onchange="() => ToggleAvailability(dayOfWeek)" />
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
             </div>
         }
         else
@@ -36,6 +47,34 @@
 
 @code {
     private Staff currentUser;
+
+    private Dictionary<DayOfWeek, List<string>> SetDoctorAvailability = new Dictionary<DayOfWeek, List<string>>();
+
+    private bool IsDayAvailable(DayOfWeek dayOfWeek)
+    {
+        return SetDoctorAvailability.ContainsKey(dayOfWeek) && SetDoctorAvailability[dayOfWeek].Any();
+    }
+
+    private void ToggleAvailability(DayOfWeek dayOfWeek)
+    {
+        if (!SetDoctorAvailability.ContainsKey(dayOfWeek))
+        {
+            SetDoctorAvailability[dayOfWeek] = new List<string>();
+        }
+
+        // Toggle the availability for the entire day
+        var dayTimeSlots = SetDoctorAvailability[dayOfWeek];
+        if (dayTimeSlots.Count == 0)
+        {
+            // All slots are currently unselected, so select all
+            dayTimeSlots.AddRange(new List<string> { "9:00 AM", "10:00 AM", "11:00 AM", "12:00 PM", "1:00 PM", "2:00 PM", "3:00 PM", "4:00 PM", "5:00 PM" });
+        }
+        else
+        {
+            // All slots are currently selected, so unselect all
+            dayTimeSlots.Clear();
+        }
+    }
 
     protected override async Task OnInitializedAsync()
     {
