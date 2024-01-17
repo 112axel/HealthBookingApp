@@ -18,7 +18,7 @@ namespace HealthCare.Core
             // Retrieve the patient by ID from the database
             return _context.Patients
                 .Include(p => p.Account)
-                .Include(p => p.Appointments)
+                .Include(p => p.Appointments.OrderBy(a => a.DateTime))
                 .ThenInclude(p => p.Staff)
                 .ThenInclude(p => p.Account)
                 .FirstOrDefault(p => p.Account.Id == accountId);
@@ -28,7 +28,7 @@ namespace HealthCare.Core
             // Retrieve the doctor by ID from the database
             return _context.Staff
                 .Include(p => p.Account)
-                .Include(p => p.Appointments)
+                .Include(p => p.Appointments.OrderBy(a => a.DateTime))
                 .ThenInclude(p => p.Patient)
                 .ThenInclude(p => p.Account)
                 .FirstOrDefault(p => p.Account.Id == accountId);
