@@ -10,7 +10,6 @@
 <AuthorizeView Roles="Doctor">
     <Authorized>
         <h3>Hello, @context.User.Identity.Name!</h3>
-        You can only see this if you're a doctor.
 
         @if (currentUser != null)
         {
@@ -28,6 +27,44 @@
         {
             <p>No user information found for the current doctor.</p>
         }
+        <div class="container mt-4">
+            <h3>Hello, @context.User.Identity.Name!</h3>
+
+            @if (currentUser != null)
+            {
+                <div>
+                    <h4>@($"{currentUser.Account.FirstName} {currentUser.Account.LastName}")</h4>
+                    <p>Set Your Availability:</p>
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Day</th>
+                                    <th>Available</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var dayOfWeek in Enum.GetValues(typeof(DayOfWeek)).Cast<DayOfWeek>())
+                                {
+                                    <tr>
+                                        <td>@dayOfWeek</td>
+                                        <td>
+                                            <div class="form-check form-switch">
+                                                <input class="form-check-input" type="checkbox" @(IsDayAvailable(dayOfWeek) ? "checked" : "" ) @onchange="() => ToggleAvailability(dayOfWeek)" />
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <p class="text-danger">No user information found for the current doctor.</p>
+            }
+        </div>
     </Authorized>
     <NotAuthorized>
         <p>You are not authorized to view this content.</p>
