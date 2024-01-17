@@ -11,6 +11,7 @@ namespace HealthCare.Domain.Models
     {
         public int Id { get; set; }
         public Account Account { get; set; }
+        public string AccountId { get; set; }
         public Role Role { get; set; }
         public List<Appointment> Appointments { get; set; }
         public List<Schedule> Schedule { get; set; }
