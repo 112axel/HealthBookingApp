@@ -1,6 +1,7 @@
 ﻿@*the DoctorPageService is added in program.cs *@
 @inject DoctorPageService DoctorService
 @inject AuthenticationStateProvider AuthenticationStateProvider
+@inject DoctorAvailabilityService AvailabilityService
 @using HealthCare.Domain.Models;
 @using System.Security.Claims
 @page "/doctor-dashboard"
@@ -45,35 +46,36 @@
     </NotAuthorized>
 </AuthorizeView>
 
+
 @code {
     private Staff currentUser;
-
     private Dictionary<DayOfWeek, List<string>> SetDoctorAvailability = new Dictionary<DayOfWeek, List<string>>();
 
     private bool IsDayAvailable(DayOfWeek dayOfWeek)
     {
-        return SetDoctorAvailability.ContainsKey(dayOfWeek) && SetDoctorAvailability[dayOfWeek].Any();
+        // Check the database for the doctor's availability
+        var availability = AvailabilityService.GetAvailability(currentUser.Id.ToString(), dayOfWeek);
+        return availability.Any();
     }
 
     private void ToggleAvailability(DayOfWeek dayOfWeek)
     {
-        if (!SetDoctorAvailability.ContainsKey(dayOfWeek))
-        {
-            SetDoctorAvailability[dayOfWeek] = new List<string>();
-        }
+        var currentAvailability = AvailabilityService.GetAvailability(currentUser.Id.ToString(), dayOfWeek);
 
         // Toggle the availability for the entire day
-        var dayTimeSlots = SetDoctorAvailability[dayOfWeek];
-        if (dayTimeSlots.Count == 0)
+        if (currentAvailability.Count == 0)
         {
             // All slots are currently unselected, so select all
-            dayTimeSlots.AddRange(new List<string> { "9:00 AM", "10:00 AM", "11:00 AM", "12:00 PM", "1:00 PM", "2:00 PM", "3:00 PM", "4:00 PM", "5:00 PM" });
+            currentAvailability.AddRange(new List<string> { "9:00 AM", "10:00 AM", "11:00 AM", "12:00 PM", "1:00 PM", "2:00 PM", "3:00 PM", "4:00 PM", "5:00 PM" });
         }
         else
         {
             // All slots are currently selected, so unselect all
-            dayTimeSlots.Clear();
+            currentAvailability.Clear();
         }
+
+        // Save updated availability data to the database
+        AvailabilityService.SaveAvailability(currentUser.Id.ToString(), dayOfWeek, currentAvailability);
     }
 
     protected override async Task OnInitializedAsync()
