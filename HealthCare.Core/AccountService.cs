@@ -29,14 +29,18 @@ namespace HealthCare.Core
                 account.Staff.Appointments = context.Appointments
                     .Include(x=>x.Patient)
                     .ThenInclude(x => x.Account)
-                    .Where(x=>x.Staff.Id ==account.Staff.Id).ToList();
+                    .Where(x=>x.Staff.Id ==account.Staff.Id)
+                    .OrderBy(x=>x.DateTime)
+                    .ToList();
             }
             else if(account.AccountType() == typeof(Patient))
             {
                 account.Patient.Appointments = context.Appointments
                     .Include(x=>x.Staff)
                     .ThenInclude(x => x.Account)
-                    .Where(x=>x.Patient.Id ==account.Patient.Id).ToList();
+                    .Where(x=>x.Patient.Id ==account.Patient.Id)
+                    .OrderBy(x=>x.DateTime)
+                    .ToList();
             }
             return account;
 
