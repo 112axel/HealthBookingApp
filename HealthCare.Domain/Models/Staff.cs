@@ -14,6 +14,5 @@ namespace HealthCare.Domain.Models
         public Role Role { get; set; }
         public List<Appointment> Appointments { get; set; }
         public List<Schedule> Schedule { get; set; }
-        public DoctorAvailability Availability { get; set; }
     }
 }

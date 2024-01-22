@@ -1,5 +1,10 @@
 ﻿using HealthCare.Data;
+using HealthCare.Domain.Enums;
 using HealthCare.Domain.Models;
+using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 public class DoctorAvailabilityService
 {
@@ -9,34 +14,35 @@ public class DoctorAvailabilityService
     {
         _dbContext = dbContext;
     }
-
-    public List<string> GetAvailability(string doctorId, DayOfWeek dayOfWeek)
+    private DateTime GetNextMonday()
     {
-        var availability = _dbContext.DoctorAvailabilities
-            .SingleOrDefault(da => da.DoctorId == doctorId && da.DayOfWeek == dayOfWeek);
+        DateTime today = DateTime.Today;
+        // The (... + 7) % 7 ensures we end up with a value in the range [0, 6]
+        int daysUntilMonday = ((int)DayOfWeek.Monday - (int)today.DayOfWeek + 7) % 7;
+        DateTime nextMonday = today.AddDays(daysUntilMonday);
 
-        return availability?.TimeSlots ?? new List<string>();
+        return nextMonday;
+    }
+    public Schedule GetAvailability(int doctorId)
+    {
+        Schedule availability = _dbContext.Staff
+             .Include(x => x.Schedule)
+             .Where(x => x.Id == doctorId)
+             .SelectMany(x => x.Schedule).First(x => x.WeekDate == GetNextMonday());
+
+        return availability;
     }
 
-    public void SaveAvailability(string doctorId, DayOfWeek dayOfWeek, List<string> timeSlots)
+    public void SaveAvailability(int doctorId, Days days, bool state)
     {
-        var availability = _dbContext.DoctorAvailabilities
-            .SingleOrDefault(da => da.DoctorId == doctorId && da.DayOfWeek == dayOfWeek);
-
-        if (availability == null)
+        var availability = GetAvailability(doctorId);
+        if (state == true)
         {
-            availability = new DoctorAvailability
-            {
-                DoctorId = doctorId,
-                DayOfWeek = dayOfWeek,
-                TimeSlots = timeSlots
-            };
-
-            _dbContext.DoctorAvailabilities.Add(availability);
+            availability.Days |= days;
         }
         else
         {
-            availability.TimeSlots = timeSlots;
+            availability.Days &= ~days;
         }
 
         _dbContext.SaveChanges();

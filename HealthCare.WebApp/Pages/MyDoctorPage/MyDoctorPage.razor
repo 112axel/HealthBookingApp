@@ -2,9 +2,12 @@
 @inject DoctorPageService DoctorService
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject DoctorAvailabilityService AvailabilityService
+@using HealthCare.Domain.Enums
 @using HealthCare.Domain.Models;
 @using System.Security.Claims
 @page "/doctor-dashboard"
+
+@page "/mydoctorpage"
 
 <AuthorizeView Roles="Doctor">
     <Authorized>
@@ -23,12 +26,13 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach (var dayOfWeek in Enum.GetValues(typeof(DayOfWeek)).Cast<DayOfWeek>())
+                        @foreach (var days in Enumerable.Range(0, 7))
                         {
+                        var flagValue = Math.Pow(2, days);
                             <tr>
-                                <td>@dayOfWeek</td>
+                                <td>@((Days) flagValue)</td>
                                 <td>
-                                    <input type="checkbox" @(IsDayAvailable(dayOfWeek) ? "checked" : "" ) @onchange="() => ToggleAvailability(dayOfWeek)" />
+                                    <input type="checkbox" @onchange="() => ToggleAvailability((Days) flagValue)" />
                                 </td>
                             </tr>
                         }
@@ -46,36 +50,20 @@
     </NotAuthorized>
 </AuthorizeView>
 
-
 @code {
     private Staff currentUser;
-    private Dictionary<DayOfWeek, List<string>> SetDoctorAvailability = new Dictionary<DayOfWeek, List<string>>();
 
-    private bool IsDayAvailable(DayOfWeek dayOfWeek)
+    // private bool IsDayAvailable(DayOfWeek dayOfWeek)
+    // {
+    //     // Check the database for the doctor's availability
+    //     var availability = AvailabilityService.GetAvailability(currentUser.Id, dayOfWeek);
+    //     return availability.Any();
+    // }
+
+    private void ToggleAvailability(Days days)
     {
-        // Check the database for the doctor's availability
-        var availability = AvailabilityService.GetAvailability(currentUser.Id.ToString(), dayOfWeek);
-        return availability.Any();
-    }
-
-    private void ToggleAvailability(DayOfWeek dayOfWeek)
-    {
-        var currentAvailability = AvailabilityService.GetAvailability(currentUser.Id.ToString(), dayOfWeek);
-
-        // Toggle the availability for the entire day
-        if (currentAvailability.Count == 0)
-        {
-            // All slots are currently unselected, so select all
-            currentAvailability.AddRange(new List<string> { "9:00 AM", "10:00 AM", "11:00 AM", "12:00 PM", "1:00 PM", "2:00 PM", "3:00 PM", "4:00 PM", "5:00 PM" });
-        }
-        else
-        {
-            // All slots are currently selected, so unselect all
-            currentAvailability.Clear();
-        }
-
         // Save updated availability data to the database
-        AvailabilityService.SaveAvailability(currentUser.Id.ToString(), dayOfWeek, currentAvailability);
+        AvailabilityService.SaveAvailability(currentUser.Id, days, false);
     }
 
     protected override async Task OnInitializedAsync()
@@ -90,3 +78,4 @@
         }
     }
 }
+
