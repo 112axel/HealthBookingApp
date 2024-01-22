@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace HealthCare.Domain.Models
 {
-    public class Patient
+    public class Patient 
     {
         public int Id { get; set; }
         public Account Account { get; set; }

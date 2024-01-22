@@ -5,7 +5,7 @@
 @using System.Security.Claims
 
 @inject BookingService BookingService
-@inject UserPageService UserService
+@inject AccountService AccountService
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @page "/book-appointment"
 
@@ -70,7 +70,8 @@
         if (user.Identity.IsAuthenticated)
         {
             // Retrieve data for the currently authenticated user
-            currentUser = UserService.GetPatientById(user.FindFirstValue(ClaimTypes.NameIdentifier));
+            //currentUser = UserService.GetPatientById(user.FindFirstValue(ClaimTypes.NameIdentifier));
+            currentUser = AccountService.GetAccountByName(user.Identity.Name).Patient;
         }
 
         SelectedRole = Role.Distriktssköterska;

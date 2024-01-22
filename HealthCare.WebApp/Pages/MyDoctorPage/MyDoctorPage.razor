@@ -1,6 +1,6 @@
 ﻿@*the DoctorPageService is added in program.cs *@
-@inject DoctorPageService DoctorService
 @inject AuthenticationStateProvider AuthenticationStateProvider
+@inject AccountService AccoundService
 @using HealthCare.Domain.Models;
 @using System.Security.Claims
 @page "/doctor-dashboard"
@@ -122,7 +122,7 @@
         if (user.Identity.IsAuthenticated)
         {
             // Retrieve data for the currently authenticated doctor
-            currentUser = DoctorService.GetDoctorByUserId(user.FindFirstValue(ClaimTypes.NameIdentifier));
+            currentUser = AccoundService.GetAccountByName(user.Identity.Name).Staff;
         }
     }
 }
