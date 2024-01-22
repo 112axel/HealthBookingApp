@@ -17,7 +17,7 @@
         <select class="form-select" id="selectedRating" @bind="selectedRating">
             @foreach (Rating rating in Enum.GetValues(typeof(Rating)))
             {
-                <option value="@rating">@rating.ToString()</option>
+                <option value="@rating">@GetStarRating(rating)</option>
             }
         </select>
     </div>
@@ -40,7 +40,7 @@
                     </div>
                     <div class="col-md-6">
                         <label for="rating" class="form-label">Rating:</label>
-                        <p class="form-control" name="rating">@feedback.Rating</p>
+                        <p class="form-control" name="rating">@GetStarRating(feedback.Rating)</p>
                     </div>
                 </div>
             </div>
@@ -50,13 +50,21 @@
 
 @code {
     private string userFeedback;
-    private Rating selectedRating = Rating.Neutral; // Default one star
+    private Rating selectedRating = Rating.Horible; // Default one star
 
     private void SubmitFeedback()
     {
         feedbackService.SaveFeedback(userFeedback, selectedRating);
         // reset the input field
         userFeedback = string.Empty;
-        selectedRating = Rating.Neutral;
+        selectedRating = Rating.Horible;
+    }
+
+    // Helper method to convert numeric rating to stars
+    private string GetStarRating(Rating rating)
+    {
+        // Each star corresponds to one numeric value
+        int numberOfStars = (int)rating;
+        return new string('★', numberOfStars);
     }
 }
