@@ -54,10 +54,13 @@
 
     private void SubmitFeedback()
     {
-        feedbackService.SaveFeedback(userFeedback, selectedRating);
-        // reset the input field
-        userFeedback = string.Empty;
-        selectedRating = Rating.Horible;
+        if (!string.IsNullOrWhiteSpace(userFeedback))
+        {
+            feedbackService.SaveFeedback(userFeedback, selectedRating);
+            // reset the input field
+            userFeedback = string.Empty;
+            selectedRating = Rating.Horible;
+        }
     }
 
     // Helper method to convert numeric rating to stars
