@@ -22,7 +22,7 @@ namespace HealthCare.Core
 
         public IEnumerable<Review> GetAllFeedback()
         {
-            return _context.Reviews.ToList();
+            return _context.Reviews.OrderByDescending(review => review.Rating).ToList();
         }
     }
 }
