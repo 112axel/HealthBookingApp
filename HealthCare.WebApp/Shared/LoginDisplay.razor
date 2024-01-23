@@ -1,6 +1,7 @@
-﻿<AuthorizeView>
+﻿@inject AccountService AccountService
+<AuthorizeView>
     <Authorized>
-        <a href="Identity/Account/Manage">Hello, @context.User.Identity?.Name!</a>
+        <a href="Identity/Account/Manage">Hello, @(GetName(context.User.Identity?.Name)!)</a>
         <form method="post" action="Identity/Account/Logout">
             <button type="submit" class="nav-link btn btn-link">Log out</button>
         </form>
@@ -10,3 +11,19 @@
         <a href="Identity/Account/Login">Log in</a>
     </NotAuthorized>
 </AuthorizeView>
+
+
+@code{
+
+    private string GetName(string? userName)
+    {
+        if(userName == null)
+        {
+            return "null";
+        }
+        var account = AccountService.GetAccountByName(userName);
+        return $"{account.FirstName} {account.LastName}";
+    }
+
+
+}
