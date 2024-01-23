@@ -27,11 +27,5 @@ namespace HealthCare.Core
                 .Include(s => s.Appointments)
                 .FirstOrDefault(s => s.Account.Id == accountId);
         }
-
-        public void SetDoctorAvailability(string doctorAccountId, List<Schedule> weeklySchedule)
-        {
-            // Logic to update the doctor's availability in the database
-            // You might want to store the availability in a separate table or extend the Staff model
-        }
     }
 }
