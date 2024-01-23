@@ -16,6 +16,7 @@ namespace HealthCare.Data
         {
 
         }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Patient>()
@@ -34,6 +35,8 @@ namespace HealthCare.Data
         public DbSet<Patient> Patients { get; set; }
         public DbSet<Review> Reviews { get; set; }
         public DbSet<Staff> Staff { get; set; }
+        public DbSet<Schedule> Schedule { get; set; }
         public DbSet<Account> Accounts { get; set; }
     }
+
 }
