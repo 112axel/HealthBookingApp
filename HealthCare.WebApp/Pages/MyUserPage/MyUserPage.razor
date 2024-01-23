@@ -9,25 +9,26 @@
 
 <AuthorizeView Roles="Patient">
     <Authorized>
-        <h3>Hello, @context.User.Identity.Name!</h3>
-        You can only see this if you're a patient.
+        <div class="container mt-4">
+            <h3>Hello, @context.User.Identity.Name!</h3>
 
-        @if (currentUser != null)
-        {
-            <div>
-                <h4>@($"{currentUser.Account.FirstName} {currentUser.Account.LastName}")</h4>
-                <ul>
-                    @foreach (var appointment in currentUser.Appointments)
-                    {
-                        <li>@($"{appointment.Service} on {appointment.DateTime}")</li>
-                    }
-                </ul>
-            </div>
-        }
-        else
-        {
-            <p>No user information found for the current user.</p>
-        }
+            @if (currentUser != null)
+            {
+                <div>
+                    <h4>@($"{currentUser.Account.FirstName} {currentUser.Account.LastName}")</h4>
+                    <ul class="list-group">
+                        @foreach (var appointment in currentUser.Appointments)
+                        {
+                            <li class="list-group-item">@($"{appointment.Service} on {appointment.DateTime}")</li>
+                        }
+                    </ul>
+                </div>
+            }
+            else
+            {
+                <p class="text-danger">No user information found for the current user.</p>
+            }
+        </div>
     </Authorized>
     <NotAuthorized>
         <p>You are not authorized to view this content.</p>

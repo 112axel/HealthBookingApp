@@ -117,6 +117,7 @@ namespace HealthCare.WebApp.Areas.Identity.Pages.AccountNamespace
                 //TODO save right name
                 user.FirstName = "testing";
                 user.LastName = "testingson";
+                user.Patient = new Patient();
 
                 await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
                 await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);

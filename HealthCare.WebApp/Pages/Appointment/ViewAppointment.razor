@@ -1,8 +1,7 @@
 ﻿@*the AppointmentService is added in program.cs *@
-@inject AppointmentService appointmentService
 @inject HealthContext HealthContext
 @inject AuthenticationStateProvider AuthenticationStateProvider
-@inject HealthCare.Core.DoctorPageService DoctorPageService
+@inject AccountService AccountService
 @*sets the component as a route, nav is changes to this route => see NavMenu*@
 @page "/appointment"
 @using HealthCare.Data
@@ -103,11 +102,12 @@
             // Retrieve data for the currently authenticated user
             if (user.IsInRole("Patient"))
             {
-                currentPatient = appointmentService.GetPatientById(user.FindFirstValue(ClaimTypes.NameIdentifier));
+                currentPatient = AccountService.GetAccountByName(user.Identity.Name).Patient;
             }
             else
             {
-                currentDoctor = appointmentService.GetDoctorById(user.FindFirstValue(ClaimTypes.NameIdentifier));
+                //currentDoctor = appointmentService.GetDoctorById(user.Identity.Name);
+                currentDoctor = AccountService.GetAccountByName(user.Identity.Name).Staff;
             }
         }
     }

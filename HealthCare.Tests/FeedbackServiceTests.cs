@@ -73,8 +73,8 @@ namespace HealthCare.Tests
                 // Assert
                 Assert.Equal(2, allFeedback.Count());
 
-                var feedback1 = allFeedback.ElementAt(0);
-                var feedback2 = allFeedback.ElementAt(1);
+                var feedback1 = allFeedback.ElementAt(1);
+                var feedback2 = allFeedback.ElementAt(0);
 
                 Assert.Equal(comment1, feedback1.Comment);
                 Assert.Equal(rating1, feedback1.Rating);

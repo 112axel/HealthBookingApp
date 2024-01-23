@@ -13,10 +13,11 @@ namespace HealthCare.Core
             this.context = context;
         }
 
-        public void BookApointment(Staff staff, Patient patient, Appointment appointment)
+        public void BookApointment(Staff staff, Patient patient, Appointment appointment,string subject)
         {
             appointment.Staff = staff;
             appointment.Patient = patient;
+            appointment.Service = subject;
             context.Appointments.Add(appointment);
             context.SaveChanges();
         }

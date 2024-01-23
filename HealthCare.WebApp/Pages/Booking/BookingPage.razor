@@ -5,7 +5,7 @@
 @using System.Security.Claims
 
 @inject BookingService BookingService
-@inject UserPageService UserService
+@inject AccountService AccountService
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @page "/book-appointment"
 
@@ -35,6 +35,10 @@
     </InputSelect>
 }
 <div>
+    <lable>What service do you recuire?:</lable>
+    <input @bind="subject" />
+</div>
+<div>
 
     @foreach(var day in availibleTimes ) {
         <div>
@@ -55,6 +59,7 @@
     private Staff? SelectedDoctor { get; set; }
     private List<Staff> StaffOptions { get; set; } = new();
     private Patient currentUser;
+    private string subject { get; set; }
 
     protected async override Task OnInitializedAsync()
     {
@@ -65,7 +70,8 @@
         if (user.Identity.IsAuthenticated)
         {
             // Retrieve data for the currently authenticated user
-            currentUser = UserService.GetPatientById(user.FindFirstValue(ClaimTypes.NameIdentifier));
+            //currentUser = UserService.GetPatientById(user.FindFirstValue(ClaimTypes.NameIdentifier));
+            currentUser = AccountService.GetAccountByName(user.Identity.Name).Patient;
         }
 
         SelectedRole = Role.Distriktssköterska;
@@ -92,7 +98,7 @@
 
     private void BookApointment(Appointment apointment)
     {
-        BookingService.BookApointment(SelectedDoctor, currentUser, apointment);
+        BookingService.BookApointment(SelectedDoctor, currentUser, apointment,subject);
         LoadAppointment(SelectedDoctor, GetNextMonday());
         StateHasChanged();
     }
