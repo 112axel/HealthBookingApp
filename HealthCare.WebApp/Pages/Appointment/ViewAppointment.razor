@@ -2,6 +2,9 @@
 @inject HealthContext HealthContext
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject AccountService AccountService
+@inject AppointmentService AppointmentService
+@inject Microsoft.AspNetCore.Components.NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime
 @*sets the component as a route, nav is changes to this route => see NavMenu*@
 @page "/appointment"
 @using HealthCare.Data
@@ -25,6 +28,8 @@
                                 <h5 class="mb-1">@appointment.Service</h5>
                                 <p class="mb-1">@($"Date: {appointment.DateTime}")</p>
                                 <p class="mb-1">@($"Doctor: {appointment.Staff.Account.FirstName} {appointment.Staff.Account.LastName}.")</p>
+                                <button class="btn btn-primary" @onclick="()=>EditAppointment(appointment)">Edit</button>
+                                <button class="btn btn-danger" @onclick="()=>DeleteAppointment(appointment.Id)">Delete</button>
                             </div>
                         }
                     </div>
@@ -40,6 +45,8 @@
                                 <h5 class="mb-1">@appointment.Service</h5>
                                 <p class="mb-1">@($"Date: {appointment.DateTime}")</p>
                                 <p class="mb-1">@($"Doctor: {appointment.Staff.Account.FirstName} {appointment.Staff.Account.LastName}.")</p>
+                                <button class="btn btn-primary" @onclick="()=>EditAppointment(appointment)">Edit</button>
+                                <button class="btn btn-danger" @onclick="()=>DeleteAppointment(appointment.Id)">Delete</button>
                             </div>
                         }
                     </div>
@@ -64,6 +71,8 @@
                                 <h5 class="mb-1">@appointment.Service</h5>
                                 <p class="mb-1">@($"Date: {appointment.DateTime}")</p>
                                 <p class="mb-1">@($"Patient: {appointment.Patient.Account.FirstName} {appointment.Patient.Account.LastName}.")</p>
+                                <button class="btn btn-primary" @onclick="()=>EditAppointment(appointment)">Edit</button>
+                                <button class="btn btn-danger" @onclick="()=>DeleteAppointment(appointment.Id)">Delete</button>
                             </div>
                         }
                     </div>
@@ -79,6 +88,8 @@
                                 <h5 class="mb-1">@appointment.Service</h5>
                                 <p class="mb-1">@($"Date: {appointment.DateTime}")</p>
                                 <p class="mb-1">@($"Patient: {appointment.Patient.Account.FirstName} {appointment.Patient.Account.LastName}.")</p>
+                                <button class="btn btn-primary" @onclick="()=>EditAppointment(appointment)">Edit</button>
+                                <button class="btn btn-danger" @onclick="()=>DeleteAppointment(appointment.Id)">Delete</button>
                             </div>
                         }
                     </div>
@@ -109,6 +120,24 @@
                 //currentDoctor = appointmentService.GetDoctorById(user.Identity.Name);
                 currentDoctor = AccountService.GetAccountByName(user.Identity.Name).Staff;
             }
+        }
+    }
+    private async Task EditAppointment(Appointment appointment)
+    {
+        // You navigate to bookingPage for changes
+        NavigationManager.NavigateTo($"/book-appointment/{appointment.Id}");
+    }
+
+    private async Task DeleteAppointment(int appointmentId)
+    {
+        // You show a confirmation and then call the delete method
+        var confirmed = await JSRuntime.InvokeAsync<bool>("confirm", "Are you sure you want to delete this appointment?");
+
+        if (confirmed)
+        {
+            // Call the delete method
+            await DeleteAppointment(appointmentId);
+            NavigationManager.NavigateTo("/appointment", forceLoad: true);
         }
     }
 }
