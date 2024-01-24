@@ -7,6 +7,8 @@
 @inject BookingService BookingService
 @inject AccountService AccountService
 @inject AuthenticationStateProvider AuthenticationStateProvider
+@inject SheduleService SheduleService
+
 @page "/book-appointment"
 
 
@@ -38,14 +40,18 @@
     <lable>What service do you recuire?:</lable>
     <input @bind="subject" />
 </div>
+
+<button disabled = "@(!NewSheduleAvailible(-1))" @onclick="@(()=>ChangeShedule(-1))">Previous Week</button>
+<button disabled = "@(!NewSheduleAvailible(1))" @onclick="@(()=>ChangeShedule(1))">Next Week</button>
+
 <div>
 
     @foreach(var day in availibleTimes ) {
         <div>
-            <h2>@day.Key.ToString()</h2>
+            <h2>@($"{day.Key.DayOfWeek.ToString()} {DateFormating(day.Key.Date)}")</h2>
             @foreach (var appointment in day.Value)
             {
-                <button onclick="@(()=>{BookApointment(appointment);})">@DateFromating(appointment.DateTime)</button>
+                <button onclick="@(()=>{BookApointment(appointment);})">@TimeFormating(appointment.DateTime)</button>
             }
         </div>
     }
@@ -53,13 +59,15 @@
 </div>
 @code {
 
-    private Dictionary<Days,List<Appointment>> availibleTimes = new();
+    private Dictionary<DateTime,List<Appointment>> availibleTimes = new();
 
     private Role? SelectedRole { get; set; }
     private Staff? SelectedDoctor { get; set; }
     private List<Staff> StaffOptions { get; set; } = new();
     private Patient currentUser;
     private string subject { get; set; }
+    private List<Schedule> shedules { get; set; }
+    private Schedule selectedShedule { get; set; }
 
     protected async override Task OnInitializedAsync()
     {
@@ -78,9 +86,33 @@
         NewSelectedRole();
     }
 
+    private void ChangeShedule(int offset)
+    {
+        if (NewSheduleAvailible(offset))
+        {
+            selectedShedule = shedules[NewIndex(offset)];
+        }
+        availibleTimes = BookingService.AllApointmentsInWeek(SelectedDoctor, selectedShedule);
+    }
+
+    private bool NewSheduleAvailible(int offset)
+    {
+        var newIndex = NewIndex(offset);
+        return (newIndex > -1 && newIndex < shedules.Count);
+    }
+
+    private int NewIndex(int offset)
+    {
+        var currentIndex = shedules.IndexOf(selectedShedule);
+        var newIndex = currentIndex + offset;
+        return newIndex;
+    }
+
     private void LoadAppointment(Staff staff, DateTime weekStart)
     {
-        availibleTimes = BookingService.GetAvailableTimeSlots(staff, weekStart);
+        shedules = SheduleService.GetSchedules(staff);
+        selectedShedule = shedules.First();
+        availibleTimes = BookingService.AllApointmentsInWeek(staff, selectedShedule);
     }
 
     private void NewSelectedRole()
@@ -113,8 +145,14 @@
         return nextMonday;
     }
 
-    private string DateFromating(DateTime datetime)
+    private string TimeFormating(DateTime datetime)
     {
         return $"{datetime.Hour}:{datetime.Minute.ToString().PadLeft(2, '0')}";
     }
+
+    private string DateFormating(DateTime dateTime)
+    {
+        return dateTime.ToString("yyyy-MM-dd");
+    }
+
 }
