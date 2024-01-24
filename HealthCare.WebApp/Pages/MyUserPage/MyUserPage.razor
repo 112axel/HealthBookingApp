@@ -1,7 +1,7 @@
 ﻿@*the UserPageService is added in program.cs *@
-@inject UserPageService UserService
 @inject HealthContext HealthContext
 @inject AuthenticationStateProvider AuthenticationStateProvider
+@inject AccountService AccountSerive
 @using System.Security.Claims
 @using HealthCare.Domain.Models
 @using HealthCare.Data
@@ -47,7 +47,7 @@
         if (user.Identity.IsAuthenticated)
         {
             // Retrieve data for the currently authenticated user
-            currentUser = UserService.GetPatientById(user.FindFirstValue(ClaimTypes.NameIdentifier));
+            currentUser = AccountSerive.GetAccountByName(user.Identity.Name).Patient;
         }
     }
 }

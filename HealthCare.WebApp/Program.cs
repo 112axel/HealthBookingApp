@@ -15,9 +15,6 @@ builder.Services.AddServerSideBlazor();
 builder.Services.AddMvc();
 builder.Services.AddScoped<FeedbackService>();
 builder.Services.AddScoped<BookingService>();
-builder.Services.AddScoped<UserPageService>();
-builder.Services.AddScoped<DoctorPageService>();
-builder.Services.AddScoped<DoctorAvailabilityService>();
 builder.Services.AddScoped<AccountService>();
 builder.Services.AddScoped<ScheduleService>();
 
