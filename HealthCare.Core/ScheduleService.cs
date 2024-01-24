@@ -13,12 +13,12 @@ using System.Threading.Tasks;
 
 namespace HealthCare.Core
 {
-    public class SheduleService
+    public class ScheduleService
     {
         private HealthContext context { get; set; }
         private static int amountOfFutureWeeks = 4;
         private static Days defualtDays = Days.WeekDay;
-        public SheduleService(HealthContext context)
+        public ScheduleService(HealthContext context)
         {
             this.context = context;
         }
@@ -30,6 +30,9 @@ namespace HealthCare.Core
         /// <returns></returns>
         public List<Schedule> GetSchedules(Staff staff)
         {
+
+            context.Entry(staff).Collection(x => x.Schedule).Load();
+
             List<Schedule> shedules = staff.Schedule;
 
             if (shedules.Count() < amountOfFutureWeeks)
@@ -49,6 +52,20 @@ namespace HealthCare.Core
         {
             var today = DateTime.Now;
             return new GregorianCalendar().AddDays(today, -((int)today.DayOfWeek) + 1);
+        }
+
+        public void ToggleDay(Schedule schedule, Days day)
+        {
+
+            if (schedule.Days.HasFlag(day))
+            {
+                schedule.Days &= ~day;
+            }
+            else
+            {
+                schedule.Days |= day;
+            }
+            context.SaveChanges();
         }
 
     }
