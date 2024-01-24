@@ -36,10 +36,10 @@
                 </div>
 
                 <div class="col-md-6">
-                    <h3>Upcoming Appointments</h3>
+                    <h3>Appointment History</h3>
                     <hr class="mb-4 w-50">
                     <div class="list-group">
-                        @foreach (var appointment in currentPatient.Appointments.Where(a => a.DateTime > DateTime.Now))
+                        @foreach (var appointment in currentPatient.Appointments.Where(a => a.DateTime < DateTime.Now))
                         {
                             <div class="list-group-item">
                                 <h5 class="mb-1">@appointment.Service</h5>
@@ -79,10 +79,10 @@
                 </div>
 
                 <div class="col-md-6">
-                    <h3>Upcoming Appointments</h3>
+                    <h3>Appointment History</h3>
                     <hr class="mb-4 w-50">
                     <div class="list-group">
-                        @foreach (var appointment in currentDoctor.Appointments.Where(a => a.DateTime > DateTime.Now))
+                        @foreach (var appointment in currentDoctor.Appointments.Where(a => a.DateTime < DateTime.Now))
                         {
                             <div class="list-group-item">
                                 <h5 class="mb-1">@appointment.Service</h5>
