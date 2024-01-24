@@ -16,7 +16,11 @@ builder.Services.AddMvc();
 builder.Services.AddScoped<FeedbackService>();
 builder.Services.AddScoped<BookingService>();
 builder.Services.AddScoped<AccountService>();
+<<<<<<< HEAD
 builder.Services.AddScoped<ScheduleService>();
+=======
+builder.Services.AddScoped<AppointmentService>();
+>>>>>>> 7034e5391e4fe107155d40a8c4968d6782ab1421
 
 
 builder.Services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<Account>>();
