@@ -35,9 +35,16 @@
     </InputSelect>
 }
 <div>
-    <lable>What service do you recuire?:</lable>
+    <lable>What service do you require?:</lable>
     <input @bind="subject" />
 </div>
+
+@if (bookingSuccessful)
+{
+    <div class="alert alert-success" role="alert">
+        Booking successful!
+    </div>
+}
 <div>
 
     @foreach(var day in availibleTimes ) {
@@ -60,6 +67,7 @@
     private List<Staff> StaffOptions { get; set; } = new();
     private Patient currentUser;
     private string subject { get; set; }
+    private bool bookingSuccessful = false;
 
     protected async override Task OnInitializedAsync()
     {
@@ -77,6 +85,8 @@
         SelectedRole = Role.Distriktssköterska;
         NewSelectedRole();
     }
+
+ 
 
     private void LoadAppointment(Staff staff, DateTime weekStart)
     {
@@ -96,10 +106,14 @@
         LoadAppointment(SelectedDoctor,GetNextMonday());
     }
 
-    private void BookApointment(Appointment apointment)
+    private void BookApointment(Appointment appointment)
     {
-        BookingService.BookApointment(SelectedDoctor, currentUser, apointment,subject);
+        BookingService.BookApointment(SelectedDoctor, currentUser, appointment, subject);
         LoadAppointment(SelectedDoctor, GetNextMonday());
+
+        // Set the flag to true after a successful booking
+        bookingSuccessful = true;
+
         StateHasChanged();
     }
 

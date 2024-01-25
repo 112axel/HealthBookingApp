@@ -114,7 +114,7 @@
             }
             else
             {
-                //currentDoctor = appointmentService.GetDoctorById(user.Identity.Name);
+                //currentDoctor = appointmentService.GetDoctorById(user.Identity.Name); 
                 currentDoctor = AccountService.GetAccountByName(user.Identity.Name).Staff;
             }
         }
