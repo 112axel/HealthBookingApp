@@ -1,15 +1,19 @@
-﻿@*the DoctorPageService is added in program.cs *@
-@inject AuthenticationStateProvider AuthenticationStateProvider
-@inject DoctorAvailabilityService AvailabilityService
+﻿@inject AuthenticationStateProvider AuthenticationStateProvider
 @inject Microsoft.AspNetCore.Components.NavigationManager NavigationManager
 @using HealthCare.Domain.Enums
 @inject AccountService AccountService
+@using HealthCare.Domain.Enums
+@using HealthCare.Domain.Helpers
 @using HealthCare.Domain.Models;
 @using System.Security.Claims
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject AccountService AccoundService
+@inject ScheduleService ScheduleService
 @page "/doctor-dashboard"
 
 <AuthorizeView Roles="Doctor">
     <Authorized>
+
         <div class="container mt-4">
             <h3>Hello, @currentUser.Account.FirstName @currentUser.Account.LastName!</h3>
 
@@ -33,6 +37,9 @@
                     <div class="card-body">
                         <h4>Set Your Availability:</h4>
 
+                        <button disabled="@(!paginationHelper.IndexOffsetAllowed(-1))" @onclick="@(()=>ChangeShedule(-1))">Previous Week</button>
+                        <button disabled="@(!paginationHelper.IndexOffsetAllowed(1))" @onclick="@(()=>ChangeShedule(1))">Next Week</button>
+
                         <div class="container mt-4">
                             <div class="row">
                                 <div class="col-md-6">
@@ -43,16 +50,16 @@
                                 </div>
                             </div>
 
-                            @foreach (var days in Enumerable.Range(0, 7))
+                            @foreach (var day in Enumerable.Range(0, 7))
                             {
-                                var flagValue = Math.Pow(2, days);
+                                    var flagValue = (Days)Math.Pow(2, day);
                                 <div class="row mb-2">
                                     <div class="col-md-6">
-                                        @((Days)flagValue)
+                                            @($"{flagValue} {selectedSchedule.WeekDate.AddDays(day).ToString("yyyy-MM-dd")}")
                                     </div>
                                     <div class="col-md-6">
                                         <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" @onchange="() => ToggleAvailability((Days)flagValue)" />
+                                            <input class="form-check-input" type="checkbox" checked="@selectedSchedule.Days.HasFlag(flagValue)" @onchange="() => ToggleAvailability(flagValue)" />
                                         </div>
                                     </div>
                                 </div>
@@ -81,11 +88,19 @@
 
 @code {
     private Staff currentUser;
+    private PaginationHelper<Schedule> paginationHelper { get; set; }
+    private Schedule selectedSchedule { get; set; } = new();
+
+    private void ChangeShedule(int offset)
+    {
+        selectedSchedule = paginationHelper.ChangePage(offset);
+    }
+
 
     private void ToggleAvailability(Days days)
     {
         // Save updated availability data to the database
-        AvailabilityService.SaveAvailability(currentUser.Id, days, false);
+        ScheduleService.ToggleDay(selectedSchedule, days);
     }
 
     protected override async Task OnInitializedAsync()
@@ -96,7 +111,9 @@
         if (user.Identity.IsAuthenticated)
         {
             // Retrieve data for the currently authenticated doctor
-            currentUser = AccountService.GetAccountByName(user.Identity.Name).Staff;
+            currentUser = AccoundService.GetAccountByName(user.Identity.Name).Staff;
+            paginationHelper = new(ScheduleService.GetSchedules(currentUser));
+            selectedSchedule = paginationHelper.GetCurrentPage();
         }
     }
 
