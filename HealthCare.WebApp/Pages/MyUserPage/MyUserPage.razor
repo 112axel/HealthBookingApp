@@ -2,26 +2,27 @@
 @inject UserPageService UserService
 @inject HealthContext HealthContext
 @inject AuthenticationStateProvider AuthenticationStateProvider
+@inject Microsoft.AspNetCore.Components.NavigationManager NavigationManager
 @using System.Security.Claims
 @using HealthCare.Domain.Models
 @using HealthCare.Data
 @page "/personal-dashboard"
 
-<AuthorizeView Roles="Patient">
+<AuthorizeView>
     <Authorized>
         <div class="container mt-4">
-            <h3>Hello, @context.User.Identity.Name!</h3>
+            <h3>Hello, @currentUser.Account.FirstName @currentUser.Account.LastName!</h3>
 
             @if (currentUser != null)
             {
+                <p><strong>User Information:</strong></p>
                 <div>
-                    <h4>@($"{currentUser.Account.FirstName} {currentUser.Account.LastName}")</h4>
-                    <ul class="list-group">
-                        @foreach (var appointment in currentUser.Appointments)
-                        {
-                            <li class="list-group-item">@($"{appointment.Service} on {appointment.DateTime}")</li>
-                        }
-                    </ul>
+                    <p><strong>Name:</strong> @currentUser.Account.FirstName @currentUser.Account.LastName</p>
+                    <p><strong>Age:</strong> @currentUser.Account.Age</p>
+                    <p><strong>Email:</strong> @currentUser.Account.Email</p>
+                    <p><strong>Phone number:</strong> @currentUser.Account.PhoneNumber</p>
+                    <p><strong>Appointments:</strong> <NavLink href="/appointment">View Appointments</NavLink> </p>
+                    <button class="btn btn-primary" @onclick="EditUser">Edit</button>
                 </div>
             }
             else
@@ -49,5 +50,11 @@
             // Retrieve data for the currently authenticated user
             currentUser = UserService.GetPatientById(user.FindFirstValue(ClaimTypes.NameIdentifier));
         }
+    }
+
+    private void EditUser()
+    {
+        // Navigate to the edit page
+        NavigationManager.NavigateTo("/edit-user", true);
     }
 }
