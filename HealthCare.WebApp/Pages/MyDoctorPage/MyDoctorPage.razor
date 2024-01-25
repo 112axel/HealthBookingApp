@@ -1,10 +1,11 @@
 ﻿@*the DoctorPageService is added in program.cs *@
-@inject AuthenticationStateProvider AuthenticationStateProvider
-@inject DoctorAvailabilityService AvailabilityService
 @using HealthCare.Domain.Enums
-@inject AccountService AccoundService
+@using HealthCare.Domain.Helpers
 @using HealthCare.Domain.Models;
 @using System.Security.Claims
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject AccountService AccoundService
+@inject ScheduleService ScheduleService
 @page "/doctor-dashboard"
 
 @page "/mydoctorpage"
@@ -13,6 +14,8 @@
     <Authorized>
         <h3>Hello, @context.User.Identity.Name!</h3>
 
+        <button disabled="@(!paginationHelper.IndexOffsetAllowed(-1))" @onclick="@(()=>ChangeShedule(-1))">Previous Week</button>
+        <button disabled="@(!paginationHelper.IndexOffsetAllowed(1))" @onclick="@(()=>ChangeShedule(1))">Next Week</button>
         @if (currentUser != null)
         {
             <div>
@@ -26,13 +29,13 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach (var days in Enumerable.Range(0, 7))
+                        @foreach (var day in Enumerable.Range(0, 7))
                         {
-                        var flagValue = Math.Pow(2, days);
+                            var flagValue = (Days)Math.Pow(2, day);
                             <tr>
-                                <td>@((Days) flagValue)</td>
+                                <td>@($"{flagValue} {selectedSchedule.WeekDate.AddDays(day).ToString("yyyy-MM-dd")}")</td>
                                 <td>
-                                    <input type="checkbox" @onchange="() => ToggleAvailability((Days) flagValue)" />
+                                    <input type="checkbox" checked = "@selectedSchedule.Days.HasFlag(flagValue)" @onchange="() => ToggleAvailability(flagValue)" />
                                 </td>
                             </tr>
                         }
@@ -44,44 +47,6 @@
         {
             <p>No user information found for the current doctor.</p>
         }
-        <div class="container mt-4">
-            <h3>Hello, @context.User.Identity.Name!</h3>
-
-            @if (currentUser != null)
-            {
-                <div>
-                    <h4>@($"{currentUser.Account.FirstName} {currentUser.Account.LastName}")</h4>
-                    <p>Set Your Availability:</p>
-                    <div class="table-responsive">
-                        <table class="table table-bordered">
-                            <thead>
-                                <tr>
-                                    <th>Day</th>
-                                    <th>Available</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var dayOfWeek in Enum.GetValues(typeof(DayOfWeek)).Cast<DayOfWeek>())
-                                {
-                                    <tr>
-                                        <td>@dayOfWeek</td>
-                                        <td>
-                                            <div class="form-check form-switch">
-                                                <input class="form-check-input" type="checkbox" @(IsDayAvailable(dayOfWeek) ? "checked" : "" ) @onchange="() => ToggleAvailability(dayOfWeek)" />
-                                            </div>
-                                        </td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            }
-            else
-            {
-                <p class="text-danger">No user information found for the current doctor.</p>
-            }
-        </div>
     </Authorized>
     <NotAuthorized>
         <p>You are not authorized to view this content.</p>
@@ -90,11 +55,19 @@
 
 @code {
     private Staff currentUser;
+    private PaginationHelper<Schedule> paginationHelper { get; set; }
+    private Schedule selectedSchedule { get; set; } = new();
+
+    private void ChangeShedule(int offset)
+    {
+        selectedSchedule = paginationHelper.ChangePage(offset);
+    }
+
 
     private void ToggleAvailability(Days days)
     {
         // Save updated availability data to the database
-        AvailabilityService.SaveAvailability(currentUser.Id, days, false);
+        ScheduleService.ToggleDay(selectedSchedule, days);
     }
 
     protected override async Task OnInitializedAsync()
@@ -106,6 +79,8 @@
         {
             // Retrieve data for the currently authenticated doctor
             currentUser = AccoundService.GetAccountByName(user.Identity.Name).Staff;
+            paginationHelper = new(ScheduleService.GetSchedules(currentUser));
+            selectedSchedule = paginationHelper.GetCurrentPage();
         }
     }
 }

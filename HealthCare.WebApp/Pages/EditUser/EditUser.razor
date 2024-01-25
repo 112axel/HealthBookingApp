@@ -1,0 +1,101 @@
+﻿@inject UserPageService UserService
+@inject HealthContext HealthContext
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject AccountService AccountService
+@inject Microsoft.AspNetCore.Components.NavigationManager NavigationManager
+@page "/edit-user"
+@using HealthCare.Data
+@using HealthCare.Domain.Models
+@using System.Security.Claims
+
+<h3 class="mt-4 mb-4 text-center">Edit User Information</h3>
+
+<div class="container">
+    @if (currentUser != null)
+    {
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="firstName">First Name:</label>
+                    <input type="text" class="form-control" id="firstName" @bind="firstName" />
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="lastName">Last Name:</label>
+                    <input type="text" class="form-control" id="lastName" @bind="lastName" />
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="age">Age:</label>
+                    <input type="text" class="form-control" id="age" @bind="age" />
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="email">Email:</label>
+                    <input type="text" class="form-control" id="email" @bind="email" />
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="phoneNumber">Phone number:</label>
+            <input type="text" class="form-control" id="phoneNumber" @bind="phoneNumber" />
+        </div>
+
+        <button class="btn btn-primary" @onclick="SaveChanges">Save Changes</button>
+    }
+    else
+    {
+        <p>Loading user data...</p>
+    }
+</div>
+
+
+@code {
+    private Patient currentUser;
+
+    public string firstName { get; set; }
+    public string lastName { get; set; }
+    public int? age { get; set; }
+    public string email { get; set; }
+    public string phoneNumber { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.Identity.IsAuthenticated)
+        {
+            // Retrieve data for the currently authenticated user
+            currentUser = AccountService.GetAccountByName(user.Identity.Name).Patient;
+
+            // Initialize input fields with user data
+            firstName = currentUser.Account.FirstName;
+            lastName = currentUser.Account.LastName;
+            age = currentUser.Account.Age;
+            email = currentUser.Account.Email;
+            phoneNumber = currentUser.Account.PhoneNumber;
+        }
+    }
+
+    private void SaveChanges()
+    {
+        if (!string.IsNullOrWhiteSpace(firstName) || !string.IsNullOrWhiteSpace(lastName) || !string.IsNullOrWhiteSpace(email) || !string.IsNullOrWhiteSpace(phoneNumber))
+        {
+            // Save changes to the user's information
+            UserService.UpdatePatient(currentUser, firstName, lastName, age, email, phoneNumber);
+
+            // Navigate back to the personal dashboard after saving changes
+            NavigationManager.NavigateTo("/personal-dashboard");
+        }
+    }
+}

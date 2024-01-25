@@ -11,20 +11,35 @@ namespace HealthCare.Core
 {
     public class UserPageService
     {
-            private readonly HealthContext healthContext;
+        private readonly HealthContext healthContext;
 
-            public UserPageService(HealthContext healthContext)
-            {
-                this.healthContext = healthContext;
-            }
+        public UserPageService(HealthContext healthContext)
+        {
+            this.healthContext = healthContext;
+        }
 
-            public Patient GetPatientById(string accountId)
+        public void UpdatePatient(Patient currentUser, string firstName, string lastName, int? age, string email, string phoneNumber)
+        {
+            if (currentUser != null)
             {
-                // Retrieve the patient by ID from the database
-                return healthContext.Patients
-                    .Include(p => p.Account)
-                    .Include(p => p.Appointments)
-                    .FirstOrDefault(p => p.Account.Id == accountId);
+                // Update properties of the existing patient with the new values
+                currentUser.Account.FirstName = firstName; 
+                currentUser.Account.LastName = lastName;
+                currentUser.Account.Age = age;
+                currentUser.Account.Email = email;
+                currentUser.Account.PhoneNumber = phoneNumber;
+
+                // Mark the entity as modified
+                healthContext.Entry(currentUser).State = EntityState.Modified;
+
+                // Save changes to the database
+                healthContext.SaveChanges();
             }
+            else
+            {
+                // Handle if the patient is not found
+                throw new ArgumentException("Patient not found");
+            }
+        }
     }
 }
