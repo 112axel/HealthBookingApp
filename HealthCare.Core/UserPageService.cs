@@ -18,15 +18,6 @@ namespace HealthCare.Core
             this.healthContext = healthContext;
         }
 
-        public Patient GetPatientById(string accountId)
-        {
-            // Retrieve the patient by ID from the database
-            return healthContext.Patients
-                .Include(p => p.Account)
-                .Include(p => p.Appointments)
-                .FirstOrDefault(p => p.Account.Id == accountId);
-        }
-
         public void UpdatePatient(Patient currentUser, string firstName, string lastName, int? age, string email, string phoneNumber)
         {
             if (currentUser != null)

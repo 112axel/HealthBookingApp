@@ -1,6 +1,7 @@
 ﻿@inject UserPageService UserService
 @inject HealthContext HealthContext
 @inject AuthenticationStateProvider AuthenticationStateProvider
+@inject AccountService AccountService
 @inject Microsoft.AspNetCore.Components.NavigationManager NavigationManager
 @page "/edit-user"
 @using HealthCare.Data
@@ -75,7 +76,7 @@
         if (user.Identity.IsAuthenticated)
         {
             // Retrieve data for the currently authenticated user
-            currentUser = UserService.GetPatientById(user.FindFirstValue(ClaimTypes.NameIdentifier));
+            currentUser = AccountService.GetAccountByName(user.Identity.Name).Patient;
 
             // Initialize input fields with user data
             firstName = currentUser.Account.FirstName;

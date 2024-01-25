@@ -1,4 +1,5 @@
-﻿@using HealthCare.Domain.Models
+﻿@using HealthCare.Domain.Helpers
+@using HealthCare.Domain.Models
 @using HealthCare.Domain.Enums
 @using HealthCare.WebApp.Pages;
 @using Microsoft.AspNetCore.Http;
@@ -7,12 +8,9 @@
 @inject BookingService BookingService
 @inject AccountService AccountService
 @inject AuthenticationStateProvider AuthenticationStateProvider
+@inject ScheduleService SheduleService
+
 @page "/book-appointment"
-
-
-<AuthorizeView Roles="Patient">
-    <p>only vissible for patient</p>
-</AuthorizeView>
 
 
 <InputSelect @bind-Value="SelectedRole" @bind-Value:after="()=>{NewSelectedRole();}">
@@ -38,14 +36,18 @@
     <lable>What service do you recuire?:</lable>
     <input @bind="subject" />
 </div>
+
+<button disabled = "@(!paginationHelper.IndexOffsetAllowed(-1))" @onclick="@(()=>ChangeShedule(-1))">Previous Week</button>
+<button disabled = "@(!paginationHelper.IndexOffsetAllowed(1))" @onclick="@(()=>ChangeShedule(1))">Next Week</button>
+
 <div>
 
     @foreach(var day in availibleTimes ) {
         <div>
-            <h2>@day.Key.ToString()</h2>
+            <h2>@($"{day.Key.DayOfWeek.ToString()} {DateFormating(day.Key.Date)}")</h2>
             @foreach (var appointment in day.Value)
             {
-                <button onclick="@(()=>{BookApointment(appointment);})">@DateFromating(appointment.DateTime)</button>
+                <button onclick="@(()=>{BookApointment(appointment);})">@TimeFormating(appointment.DateTime)</button>
             }
         </div>
     }
@@ -53,13 +55,16 @@
 </div>
 @code {
 
-    private Dictionary<Days,List<Appointment>> availibleTimes = new();
+    private Dictionary<DateTime,List<Appointment>> availibleTimes = new();
 
     private Role? SelectedRole { get; set; }
     private Staff? SelectedDoctor { get; set; }
     private List<Staff> StaffOptions { get; set; } = new();
     private Patient currentUser;
     private string subject { get; set; }
+    private Schedule selectedShedule { get; set; }
+
+    private PaginationHelper<Schedule> paginationHelper { get; set; } 
 
     protected async override Task OnInitializedAsync()
     {
@@ -78,9 +83,18 @@
         NewSelectedRole();
     }
 
+    private void ChangeShedule(int offset)
+    {
+        selectedShedule = paginationHelper.ChangePage(offset);
+        availibleTimes = BookingService.AllApointmentsInWeek(SelectedDoctor, selectedShedule);
+    }
+
+
     private void LoadAppointment(Staff staff, DateTime weekStart)
     {
-        availibleTimes = BookingService.GetAvailableTimeSlots(staff, weekStart);
+        paginationHelper =new( SheduleService.GetSchedules(staff));
+        selectedShedule = paginationHelper.GetCurrentPage();
+        availibleTimes = BookingService.AllApointmentsInWeek(staff, selectedShedule);
     }
 
     private void NewSelectedRole()
@@ -98,9 +112,12 @@
 
     private void BookApointment(Appointment apointment)
     {
-        BookingService.BookApointment(SelectedDoctor, currentUser, apointment,subject);
-        LoadAppointment(SelectedDoctor, GetNextMonday());
-        StateHasChanged();
+        if(subject != null)
+        {
+            BookingService.BookApointment(SelectedDoctor, currentUser, apointment, subject);
+            LoadAppointment(SelectedDoctor, GetNextMonday());
+            StateHasChanged();
+        }
     }
 
     private DateTime GetNextMonday()
@@ -113,8 +130,14 @@
         return nextMonday;
     }
 
-    private string DateFromating(DateTime datetime)
+    private string TimeFormating(DateTime datetime)
     {
         return $"{datetime.Hour}:{datetime.Minute.ToString().PadLeft(2, '0')}";
     }
+
+    private string DateFormating(DateTime dateTime)
+    {
+        return dateTime.ToString("yyyy-MM-dd");
+    }
+
 }

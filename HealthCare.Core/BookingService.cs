@@ -36,30 +36,27 @@ namespace HealthCare.Core
                 .Where(x=>x.Role == role).ToList();
         }
 
-        public Dictionary<Days, List<Appointment>> GetAvailableTimeSlots(Staff staff,DateTime weekStart)
-        {
-            return AllApointmentsInWeek(staff.Appointments,staff.Schedule.First(x=>x.WeekDate == weekStart));
 
-        }
-
-        private Dictionary<Days, List<Appointment>> AllApointmentsInWeek(List<Appointment> bookedAppointment, Schedule weekSchedule)
+        public Dictionary<DateTime, List<Appointment>> AllApointmentsInWeek(Staff staff, Schedule weekSchedule)
         {
-            Dictionary<Days, List<Appointment>> all = new();
+            var bookedAppointment = staff.Appointments;
+            Dictionary<DateTime, List<Appointment>> all = new();
             //Set time to 8
-            var dateTime = weekSchedule.WeekDate.AddHours(8);
+            var weekStart = weekSchedule.WeekDate.AddHours(8);
 
 
             foreach (var day in Enumerable.Range(0, 7))
             {
                 var flagValue = Math.Pow(2, day);
+                var dayStart = weekStart.AddDays(day);
 
                 if (weekSchedule.Days.HasFlag((Days)flagValue))
                 {
-                    all.Add((Days)flagValue,AllApointmentsInDay(bookedAppointment, dateTime.AddDays(day)));
+                    all.Add(dayStart,AllApointmentsInDay(bookedAppointment, dayStart));
                 }
                 else
                 {
-                    all.Add((Days)flagValue, new());
+                    all.Add(dayStart, new());
                 }
             }
 
