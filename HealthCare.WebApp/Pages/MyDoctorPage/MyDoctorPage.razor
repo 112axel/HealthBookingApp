@@ -1,92 +1,83 @@
 ﻿@*the DoctorPageService is added in program.cs *@
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject DoctorAvailabilityService AvailabilityService
+@inject Microsoft.AspNetCore.Components.NavigationManager NavigationManager
 @using HealthCare.Domain.Enums
-@inject AccountService AccoundService
+@inject AccountService AccountService
 @using HealthCare.Domain.Models;
 @using System.Security.Claims
 @page "/doctor-dashboard"
 
-@page "/mydoctorpage"
-
 <AuthorizeView Roles="Doctor">
     <Authorized>
-        <h3>Hello, @context.User.Identity.Name!</h3>
-
-        @if (currentUser != null)
-        {
-            <div>
-                <h4>@($"{currentUser.Account.FirstName} {currentUser.Account.LastName}")</h4>
-                <p>Set Your Availability:</p>
-                <table class="table table-bordered">
-                    <thead>
-                        <tr>
-                            <th>Day</th>
-                            <th>Available</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var days in Enumerable.Range(0, 7))
-                        {
-                        var flagValue = Math.Pow(2, days);
-                            <tr>
-                                <td>@((Days) flagValue)</td>
-                                <td>
-                                    <input type="checkbox" @onchange="() => ToggleAvailability((Days) flagValue)" />
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
-        }
-        else
-        {
-            <p>No user information found for the current doctor.</p>
-        }
         <div class="container mt-4">
-            <h3>Hello, @context.User.Identity.Name!</h3>
+            <h3>Hello, @currentUser.Account.FirstName @currentUser.Account.LastName!</h3>
 
             @if (currentUser != null)
             {
-                <div>
-                    <h4>@($"{currentUser.Account.FirstName} {currentUser.Account.LastName}")</h4>
-                    <p>Set Your Availability:</p>
-                    <div class="table-responsive">
-                        <table class="table table-bordered">
-                            <thead>
-                                <tr>
-                                    <th>Day</th>
-                                    <th>Available</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var dayOfWeek in Enum.GetValues(typeof(DayOfWeek)).Cast<DayOfWeek>())
-                                {
-                                    <tr>
-                                        <td>@dayOfWeek</td>
-                                        <td>
-                                            <div class="form-check form-switch">
-                                                <input class="form-check-input" type="checkbox" @(IsDayAvailable(dayOfWeek) ? "checked" : "" ) @onchange="() => ToggleAvailability(dayOfWeek)" />
-                                            </div>
-                                        </td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
+                <div class="card mt-4">
+                    <div class="card-body">
+                        <p><strong>User Information:</strong></p>
+                        <div>
+                            <p><strong>Name:</strong> @currentUser.Account.FirstName @currentUser.Account.LastName</p>
+                            <p><strong>Age:</strong> @currentUser.Account.Age</p>
+                            <p><strong>Email:</strong> @currentUser.Account.Email</p>
+                            <p><strong>Phone number:</strong> @currentUser.Account.PhoneNumber</p>
+                            <p><strong>Appointments:</strong> <NavLink href="/appointment">View Appointments</NavLink> </p>
+                            <button class="btn btn-primary" @onclick="EditUser">Edit</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mt-4">
+                    <div class="card-body">
+                        <h4>Set Your Availability:</h4>
+
+                        <div class="container mt-4">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p><strong>Day</strong></p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p><strong>Available</strong></p>
+                                </div>
+                            </div>
+
+                            @foreach (var days in Enumerable.Range(0, 7))
+                            {
+                                var flagValue = Math.Pow(2, days);
+                                <div class="row mb-2">
+                                    <div class="col-md-6">
+                                        @((Days)flagValue)
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" @onchange="() => ToggleAvailability((Days)flagValue)" />
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
                     </div>
                 </div>
             }
             else
             {
-                <p class="text-danger">No user information found for the current doctor.</p>
+                <div class="alert alert-warning mt-4" role="alert">
+                    <p>No user information found for the current doctor.</p>
+                </div>
             }
         </div>
     </Authorized>
     <NotAuthorized>
-        <p>You are not authorized to view this content.</p>
+        <div class="container mt-4">
+            <div class="alert alert-danger" role="alert">
+                <p>You are not authorized to view this content.</p>
+            </div>
+        </div>
     </NotAuthorized>
 </AuthorizeView>
+
 
 @code {
     private Staff currentUser;
@@ -105,8 +96,14 @@
         if (user.Identity.IsAuthenticated)
         {
             // Retrieve data for the currently authenticated doctor
-            currentUser = AccoundService.GetAccountByName(user.Identity.Name).Staff;
+            currentUser = AccountService.GetAccountByName(user.Identity.Name).Staff;
         }
+    }
+
+    private void EditUser()
+    {
+        // Navigate to the edit page
+        NavigationManager.NavigateTo("/edit-user", true);
     }
 }
 

@@ -3,6 +3,7 @@
 @inject HealthContext HealthContext
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject Microsoft.AspNetCore.Components.NavigationManager NavigationManager
+@inject AccountService AccountService
 @using System.Security.Claims
 @using HealthCare.Domain.Models
 @using HealthCare.Data
@@ -48,7 +49,7 @@
         if (user.Identity.IsAuthenticated)
         {
             // Retrieve data for the currently authenticated user
-            currentUser = UserService.GetPatientById(user.FindFirstValue(ClaimTypes.NameIdentifier));
+            currentUser = AccountService.GetAccountByName(user.Identity.Name).Patient;
         }
     }
 

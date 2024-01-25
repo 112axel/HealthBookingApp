@@ -18,36 +18,42 @@ namespace HealthCare.Core
             this.healthContext = healthContext;
         }
 
-        public Patient GetPatientById(string accountId)
+        public void UpdateUser(Staff? currentDoctor, Patient? currentPatient, string firstName, string lastName, int? age, string email, string phoneNumber)
         {
-            // Retrieve the patient by ID from the database
-            return healthContext.Patients
-                .Include(p => p.Account)
-                .Include(p => p.Appointments)
-                .FirstOrDefault(p => p.Account.Id == accountId);
-        }
-
-        public void UpdatePatient(Patient currentUser, string firstName, string lastName, int? age, string email, string phoneNumber)
-        {
-            if (currentUser != null)
+            if (currentDoctor != null)
             {
                 // Update properties of the existing patient with the new values
-                currentUser.Account.FirstName = firstName; 
-                currentUser.Account.LastName = lastName;
-                currentUser.Account.Age = age;
-                currentUser.Account.Email = email;
-                currentUser.Account.PhoneNumber = phoneNumber;
+                currentDoctor.Account.FirstName = firstName;
+                currentDoctor.Account.LastName = lastName;
+                currentDoctor.Account.Age = age;
+                currentDoctor.Account.Email = email;
+                currentDoctor.Account.PhoneNumber = phoneNumber;
 
                 // Mark the entity as modified
-                healthContext.Entry(currentUser).State = EntityState.Modified;
+                healthContext.Entry(currentDoctor).State = EntityState.Modified;
+
+                // Save changes to the database
+                healthContext.SaveChanges();
+            }
+            else if (currentPatient != null)
+            {
+                // Update properties of the existing patient with the new values
+                currentPatient.Account.FirstName = firstName;
+                currentPatient.Account.LastName = lastName;
+                currentPatient.Account.Age = age;
+                currentPatient.Account.Email = email;
+                currentPatient.Account.PhoneNumber = phoneNumber;
+
+                // Mark the entity as modified
+                healthContext.Entry(currentPatient).State = EntityState.Modified;
 
                 // Save changes to the database
                 healthContext.SaveChanges();
             }
             else
             {
-                // Handle if the patient is not found
-                throw new ArgumentException("Patient not found");
+                // Handle if the user is not found
+                throw new ArgumentException("User not found");
             }
         }
     }

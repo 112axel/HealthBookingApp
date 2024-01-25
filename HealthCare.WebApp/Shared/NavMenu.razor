@@ -54,16 +54,19 @@
                     </NavLink>
                 </div>
             </AuthorizeView>
-
-            <form method="post" action="Identity/Account/Logout">
-                <button type="submit" class="nav-link btn btn-link">Log out</button>
-            </form>
+            <div class="nav-item px-3">
+                <form method="post" action="Identity/Account/Logout">
+                    <button type="submit" class="nav-link btn btn-link">Log out</button>
+                </form>
+            </div>
         }
 
         @if (!AuthenticationState.User.Identity.IsAuthenticated)
         {
-            <a class="nav-item px-3" href="Identity/Account/Login">Log in</a>
-            <a class="nav-item px-3" href="Identity/Account/Register">Register</a>
+            <div class="px-3">
+                <a href="Identity/Account/Login">Log in</a>
+                <a href="Identity/Account/Register">Register</a>
+            </div>
         }
     </nav>
 </div>

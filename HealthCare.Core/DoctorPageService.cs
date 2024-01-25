@@ -19,13 +19,28 @@ namespace HealthCare.Core
             this.healthContext = healthContext;
         }
 
-        public Staff GetDoctorByUserId(string accountId)
+        public void UpdateStaff(Staff currentUser, string firstName, string lastName, int? age, string email, string phoneNumber)
         {
-            // Retrieve the doctor by ID from the database
-            return healthContext.Staff
-                .Include(s => s.Account)
-                .Include(s => s.Appointments)
-                .FirstOrDefault(s => s.Account.Id == accountId);
+            if (currentUser != null)
+            {
+                // Update properties of the existing patient with the new values
+                currentUser.Account.FirstName = firstName;
+                currentUser.Account.LastName = lastName;
+                currentUser.Account.Age = age;
+                currentUser.Account.Email = email;
+                currentUser.Account.PhoneNumber = phoneNumber;
+
+                // Mark the entity as modified
+                healthContext.Entry(currentUser).State = EntityState.Modified;
+
+                // Save changes to the database
+                healthContext.SaveChanges();
+            }
+            else
+            {
+                // Handle if the patient is not found
+                throw new ArgumentException("Staff not found");
+            }
         }
     }
 }
