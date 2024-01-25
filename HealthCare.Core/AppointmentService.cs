@@ -12,6 +12,7 @@ namespace HealthCare.Core
         {
             _context = context;
         }
+
         public void UpdateAppointment(Appointment updatedAppointment)
         {
             var existingAppointment = _context.Appointments

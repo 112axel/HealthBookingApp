@@ -33,13 +33,18 @@
     </InputSelect>
 }
 <div>
-    <lable>What service do you recuire?:</lable>
+    <lable>What service do you require?:</lable>
     <input @bind="subject" />
 </div>
 
+@if (bookingSuccessful)
+{
+    <div class="alert alert-success" role="alert">
+        Booking successful!
+    </div>
+}
 <button disabled = "@(!paginationHelper.IndexOffsetAllowed(-1))" @onclick="@(()=>ChangeShedule(-1))">Previous Week</button>
 <button disabled = "@(!paginationHelper.IndexOffsetAllowed(1))" @onclick="@(()=>ChangeShedule(1))">Next Week</button>
-
 <div>
 
     @foreach(var day in availibleTimes ) {
@@ -62,6 +67,7 @@
     private List<Staff> StaffOptions { get; set; } = new();
     private Patient currentUser;
     private string subject { get; set; }
+    private bool bookingSuccessful = false;
     private Schedule selectedShedule { get; set; }
 
     private PaginationHelper<Schedule> paginationHelper { get; set; } 
@@ -83,6 +89,7 @@
         NewSelectedRole();
     }
 
+ 
     private void ChangeShedule(int offset)
     {
         selectedShedule = paginationHelper.ChangePage(offset);
@@ -110,14 +117,15 @@
         LoadAppointment(SelectedDoctor,GetNextMonday());
     }
 
-    private void BookApointment(Appointment apointment)
+        private void BookApointment(Appointment appointment)
     {
-        if(subject != null)
-        {
-            BookingService.BookApointment(SelectedDoctor, currentUser, apointment, subject);
-            LoadAppointment(SelectedDoctor, GetNextMonday());
-            StateHasChanged();
-        }
+        BookingService.BookApointment(SelectedDoctor, currentUser, appointment, subject);
+        LoadAppointment(SelectedDoctor, GetNextMonday());
+
+        // Set the flag to true after a successful booking
+        bookingSuccessful = true;
+
+        StateHasChanged();
     }
 
     private DateTime GetNextMonday()
