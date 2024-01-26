@@ -10,6 +10,7 @@ namespace HealthCare.Domain.Models
     public class Review
     {
         public int Id { get; set; }
+        public Patient? Patient { get; set; }
         public string Comment { get; set; }
         public Rating Rating { get; set; }
     }

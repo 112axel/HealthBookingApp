@@ -1,8 +1,9 @@
-﻿@*the AppointmentService is added in program.cs *@
-@inject FeedbackService feedbackService
-@*sets the component as a route, nav is changes to this route => see NavMenu*@
+﻿@inject FeedbackService feedbackService
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject AccountService AccountService
 @page "/feedback"
 @using HealthCare.Domain.Enums
+@using HealthCare.Domain.Models
 
 <div class="container mt-5">
     <h3 class="mb-4">Leave Feedback</h3>
@@ -32,15 +33,21 @@
     {
         <div class="card mb-3">
             <div class="card-body">
-                <h5 class="card-title">Feedback</h5>
                 <div class="row">
-                    <div class="col-md-6">
-                        <label for="comment" class="form-label">Comment:</label>
-                        <p class="form-control" name="comment">@feedback.Comment</p>
+                    <div class="col-md-3">
+                        @if (feedback.Patient != null)
+                        {
+                            <p class="mb-0"><strong>@feedback.Patient.Account.FirstName @feedback.Patient.Account.LastName</strong></p>
+                            <small class="text-muted">@feedback.Patient.Account.UserName</small>
+                        }
+                        else
+                        {
+                            <p class="mb-0"><strong>Anonymous</strong></p>
+                        }
                     </div>
                     <div class="col-md-6">
-                        <label for="rating" class="form-label">Rating:</label>
-                        <p class="form-control" name="rating">@GetStarRating(feedback.Rating)</p>
+                        <p class="mb-0">@feedback.Comment</p>
+                        <p class="mb-0">Rating: @GetStarRating(feedback.Rating)</p>
                     </div>
                 </div>
             </div>
@@ -48,15 +55,30 @@
     }
 </div>
 
+
+
 @code {
+    private Patient currentUser;
     private string userFeedback;
     private Rating selectedRating = Rating.Horible; // Default one star
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.Identity.IsAuthenticated)
+        {
+            // Retrieve data for the currently authenticated user
+            currentUser = AccountService.GetAccountByName(user.Identity.Name).Patient;
+        }
+    }
 
     private void SubmitFeedback()
     {
         if (!string.IsNullOrWhiteSpace(userFeedback))
         {
-            feedbackService.SaveFeedback(userFeedback, selectedRating);
+            feedbackService.SaveFeedback(currentUser, userFeedback, selectedRating);
             // reset the input field
             userFeedback = string.Empty;
             selectedRating = Rating.Horible;
