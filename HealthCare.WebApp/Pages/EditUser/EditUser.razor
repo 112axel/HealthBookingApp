@@ -13,7 +13,7 @@
 <h3 class="mt-4 mb-4 text-center">Edit User Information</h3>
 
 <div class="container">
-    @if (currentDoctor != null || currentPatient != null)
+    @if (currentUser != null)
     {
         <div class="row mt-2">
             <div class="col-md-6">
@@ -62,8 +62,7 @@
 
 
 @code {
-    private Patient currentPatient;
-    private Staff currentDoctor;
+    private Account currentUser;
 
     public string firstName { get; set; }
     public string lastName { get; set; }
@@ -79,28 +78,14 @@
         if (user.Identity.IsAuthenticated)
         {
             // Retrieve data for the currently authenticated user
-            if (user.IsInRole("Patient"))
-            {
-                currentPatient = AccountService.GetAccountByName(user.Identity.Name).Patient;
+            currentUser = AccountService.GetAccountByName(user.Identity.Name);
 
-                // Initialize input fields with user data
-                firstName = currentPatient.Account.FirstName;
-                lastName = currentPatient.Account.LastName;
-                age = currentPatient.Account.Age;
-                email = currentPatient.Account.Email;
-                phoneNumber = currentPatient.Account.PhoneNumber;
-            }
-            else
-            {
-                currentDoctor = AccountService.GetAccountByName(user.Identity.Name).Staff;
-
-                // Initialize input fields with user data
-                firstName = currentDoctor.Account.FirstName;
-                lastName = currentDoctor.Account.LastName;
-                age = currentDoctor.Account.Age;
-                email = currentDoctor.Account.Email;
-                phoneNumber = currentDoctor.Account.PhoneNumber;
-            }
+            // Initialize input fields with user data
+            firstName = currentUser.FirstName;
+            lastName = currentUser.LastName;
+            age = currentUser.Age;
+            email = currentUser.Email;
+            phoneNumber = currentUser.PhoneNumber;
         }
     }
 
@@ -109,10 +94,10 @@
         if (!string.IsNullOrWhiteSpace(firstName) || !string.IsNullOrWhiteSpace(lastName) || !string.IsNullOrWhiteSpace(email) || !string.IsNullOrWhiteSpace(phoneNumber))
         {
             // Save changes to the user's information
-            UserService.UpdateUser(currentDoctor, currentPatient, firstName, lastName, age, email, phoneNumber);
+            UserService.UpdateUser(currentUser, firstName, lastName, age, email, phoneNumber);
 
             // Navigate back to the personal dashboard after saving changes
-            if (currentDoctor != null)
+            if (currentUser.AccountType() == typeof(Staff))
             {
                 NavigationManager.NavigateTo("/doctor-dashboard");
             }
