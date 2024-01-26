@@ -3,7 +3,9 @@
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject AccountService AccountService
 @inject Microsoft.AspNetCore.Components.NavigationManager NavigationManager
+@inject AccountService AccountService
 @page "/edit-user"
+@using HealthCare.Core
 @using HealthCare.Data
 @using HealthCare.Domain.Models
 @using System.Security.Claims
@@ -13,7 +15,7 @@
 <div class="container">
     @if (currentUser != null)
     {
-        <div class="row">
+        <div class="row mt-2">
             <div class="col-md-6">
                 <div class="form-group">
                     <label for="firstName">First Name:</label>
@@ -29,7 +31,7 @@
             </div>
         </div>
 
-        <div class="row">
+        <div class="row mt-4">
             <div class="col-md-6">
                 <div class="form-group">
                     <label for="age">Age:</label>
@@ -45,7 +47,7 @@
             </div>
         </div>
 
-        <div class="form-group">
+        <div class="form-group mt-4 mb-5">
             <label for="phoneNumber">Phone number:</label>
             <input type="text" class="form-control" id="phoneNumber" @bind="phoneNumber" />
         </div>
@@ -60,7 +62,7 @@
 
 
 @code {
-    private Patient currentUser;
+    private Account currentUser;
 
     public string firstName { get; set; }
     public string lastName { get; set; }
@@ -76,14 +78,14 @@
         if (user.Identity.IsAuthenticated)
         {
             // Retrieve data for the currently authenticated user
-            currentUser = AccountService.GetAccountByName(user.Identity.Name).Patient;
+            currentUser = AccountService.GetAccountByName(user.Identity.Name);
 
             // Initialize input fields with user data
-            firstName = currentUser.Account.FirstName;
-            lastName = currentUser.Account.LastName;
-            age = currentUser.Account.Age;
-            email = currentUser.Account.Email;
-            phoneNumber = currentUser.Account.PhoneNumber;
+            firstName = currentUser.FirstName;
+            lastName = currentUser.LastName;
+            age = currentUser.Age;
+            email = currentUser.Email;
+            phoneNumber = currentUser.PhoneNumber;
         }
     }
 
@@ -92,10 +94,17 @@
         if (!string.IsNullOrWhiteSpace(firstName) || !string.IsNullOrWhiteSpace(lastName) || !string.IsNullOrWhiteSpace(email) || !string.IsNullOrWhiteSpace(phoneNumber))
         {
             // Save changes to the user's information
-            UserService.UpdatePatient(currentUser, firstName, lastName, age, email, phoneNumber);
+            UserService.UpdateUser(currentUser, firstName, lastName, age, email, phoneNumber);
 
             // Navigate back to the personal dashboard after saving changes
-            NavigationManager.NavigateTo("/personal-dashboard");
+            if (currentUser.AccountType() == typeof(Staff))
+            {
+                NavigationManager.NavigateTo("/doctor-dashboard");
+            }
+            else
+            {
+                NavigationManager.NavigateTo("/personal-dashboard");
+            }
         }
     }
 }

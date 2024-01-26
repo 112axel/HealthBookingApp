@@ -3,6 +3,7 @@
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject AccountService AccountSerive
 @inject Microsoft.AspNetCore.Components.NavigationManager NavigationManager
+@inject AccountService AccountService
 @using System.Security.Claims
 @using HealthCare.Domain.Models
 @using HealthCare.Data
@@ -48,7 +49,7 @@
         if (user.Identity.IsAuthenticated)
         {
             // Retrieve data for the currently authenticated user
-            currentUser = AccountSerive.GetAccountByName(user.Identity.Name).Patient;
+            currentUser = AccountService.GetAccountByName(user.Identity.Name).Patient;
         }
     }
 

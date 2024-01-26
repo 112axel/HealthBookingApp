@@ -18,16 +18,16 @@ namespace HealthCare.Core
             this.healthContext = healthContext;
         }
 
-        public void UpdatePatient(Patient currentUser, string firstName, string lastName, int? age, string email, string phoneNumber)
+        public void UpdateUser(Account currentUser, string firstName, string lastName, int? age, string email, string phoneNumber)
         {
             if (currentUser != null)
             {
-                // Update properties of the existing patient with the new values
-                currentUser.Account.FirstName = firstName; 
-                currentUser.Account.LastName = lastName;
-                currentUser.Account.Age = age;
-                currentUser.Account.Email = email;
-                currentUser.Account.PhoneNumber = phoneNumber;
+                // Update properties of the existing user with the new values
+                currentUser.FirstName = firstName;
+                currentUser.LastName = lastName;
+                currentUser.Age = age;
+                currentUser.Email = email;
+                currentUser.PhoneNumber = phoneNumber;
 
                 // Mark the entity as modified
                 healthContext.Entry(currentUser).State = EntityState.Modified;
@@ -37,8 +37,8 @@ namespace HealthCare.Core
             }
             else
             {
-                // Handle if the patient is not found
-                throw new ArgumentException("Patient not found");
+                // Handle if the user is not found
+                throw new ArgumentException("User not found");
             }
         }
     }
