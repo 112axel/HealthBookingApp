@@ -1,6 +1,7 @@
 using HealthCare.Core;
 using HealthCare.Data;
 using HealthCare.Domain.Enums;
+using HealthCare.Domain.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace HealthCare.Tests
@@ -34,15 +35,25 @@ namespace HealthCare.Tests
             using (var context = new HealthContext(InMemoryDatabaseContext()))
             {
                 var feedbackService = new FeedbackService(context);
+                Patient user = new Patient()
+                {
+                    Account = new Account()
+                    {
+                        FirstName = "first",
+                        LastName = "last",
+                        UserName = "user",
+                    }
+                };
                 var comment = "Test Comment";
                 var rating = Rating.Satisfied;
 
                 // Act
-                feedbackService.SaveFeedback(comment, rating);
+                feedbackService.SaveFeedback(user, comment, rating);
 
                 // Assert
                 var savedFeedback = context.Reviews.FirstOrDefault();
                 Assert.NotNull(savedFeedback);
+                Assert.Equal(user.Account.UserName, savedFeedback.Patient.Account.UserName);
                 Assert.Equal(comment, savedFeedback.Comment);
                 Assert.Equal(rating, savedFeedback.Rating);
 
@@ -58,14 +69,23 @@ namespace HealthCare.Tests
             using (var context = new HealthContext(InMemoryDatabaseContext()))
             {
                 var feedbackService = new FeedbackService(context);
+                Patient user = new Patient()
+                {
+                    Account = new Account()
+                    {
+                        FirstName = "first",
+                        LastName = "last",
+                        UserName = "user",
+                    }
+                };
                 var comment1 = "Test Comment 1";
                 var rating1 = Rating.Satisfied;
 
                 var comment2 = "Test Comment 2";
                 var rating2 = Rating.Perfect;
 
-                feedbackService.SaveFeedback(comment1, rating1);
-                feedbackService.SaveFeedback(comment2, rating2);
+                feedbackService.SaveFeedback(user, comment1, rating1);
+                feedbackService.SaveFeedback(user, comment2, rating2);
 
                 // Act
                 var allFeedback = feedbackService.GetAllFeedback();
@@ -78,9 +98,11 @@ namespace HealthCare.Tests
 
                 Assert.Equal(comment1, feedback1.Comment);
                 Assert.Equal(rating1, feedback1.Rating);
+                Assert.Equal(user.Account.UserName, feedback1.Patient.Account.UserName);
 
                 Assert.Equal(comment2, feedback2.Comment);
                 Assert.Equal(rating2, feedback2.Rating);
+                Assert.Equal(user.Account.UserName, feedback2.Patient.Account.UserName);
 
                 //Clear
                 ClearDatabase(InMemoryDatabaseContext());

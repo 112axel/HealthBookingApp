@@ -1,6 +1,7 @@
 ﻿using HealthCare.Data;
 using HealthCare.Domain.Enums;
 using HealthCare.Domain.Models;
+using Microsoft.EntityFrameworkCore;
 using System;
 namespace HealthCare.Core
 {
@@ -13,16 +14,16 @@ namespace HealthCare.Core
             _context = context;
         }
 
-        public void SaveFeedback(string comment, Rating rating)
+        public void SaveFeedback(Patient currentUser, string comment, Rating rating)
         {
-            var review = new Review { Comment = comment, Rating = rating };
+            var review = new Review { Patient = currentUser, Comment = comment, Rating = rating };
             _context.Reviews.Add(review);
             _context.SaveChanges();
         }
 
         public IEnumerable<Review> GetAllFeedback()
         {
-            return _context.Reviews.OrderByDescending(review => review.Rating).ToList();
+            return _context.Reviews.Include(f => f.Patient).ThenInclude(p => p.Account).OrderByDescending(r => r.Rating).ToList();
         }
     }
 }
